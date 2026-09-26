@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import logoCodeClass from '../assets/images/logo.png'
-
 import Sidebar from 'primevue/sidebar'
 import SidebarSpacer from 'primevue/sidebarspacer'
 import SidebarAside from 'primevue/sidebaraside'
@@ -13,7 +12,6 @@ import SidebarFooter from 'primevue/sidebarfooter'
 import SidebarGroup from 'primevue/sidebargroup'
 import SidebarGroupContent from 'primevue/sidebargroupcontent'
 import SidebarGroupLabel from 'primevue/sidebargrouplabel'
-
 import SidebarMenu from 'primevue/sidebarmenu'
 import SidebarMenuItem from 'primevue/sidebarmenuitem'
 import SidebarMenuButton from 'primevue/sidebarmenubutton'
@@ -24,7 +22,6 @@ import {
   ListCheck,
   FileEdit,
   Comments,
-  ArrowRightArrowLeft,
   User,
   SignOut,
   Sun,
@@ -39,7 +36,6 @@ import {
 } from '../config/theme'
 
 import './sidebarProfessor.css'
-
 
 /* ==================================================
    ESTADO DA SIDEBAR
@@ -58,11 +54,9 @@ function trocarTema() {
   temaAtual.value = alternarTemaGlobal()
 }
 
-
 /* ==================================================
    NAVEGAÇÃO PRINCIPAL
    ================================================== */
-
 const itensMenu = [
   {
     label: 'Início',
@@ -91,7 +85,6 @@ const itensMenu = [
   }
 ]
 
-
 /* ==================================================
    IDENTIFICA A PÁGINA ATUAL
    ================================================== */
@@ -117,17 +110,9 @@ function navegar(item) {
   window.location.href = item.url
 }
 
-
 /* ==================================================
    AÇÕES DO FOOTER
    ================================================== */
-
-function trocarParaAluno() {
-  /*
-   * Futuramente:
-   * window.location.href = '/dashboardAluno.html'
-   */
-}
 
 function abrirPerfil() {
   /*
@@ -159,7 +144,6 @@ function sair() {
 
     <SidebarAside class="cc-sidebar-aside">
       <SidebarPanel class="cc-sidebar-panel">
-
         <SidebarHeader class="cc-sidebar-header">
           <div class="cc-sidebar-brand">
             <div
@@ -171,7 +155,6 @@ function sair() {
                 alt="Logo do CodeClass"
               />
             </div>
-
             <div class="cc-sidebar-brand-text">
               <strong>
                 Code<span>Class</span>
@@ -186,7 +169,6 @@ function sair() {
             <SidebarGroupLabel class="cc-sidebar-group-label">
               Navegação
             </SidebarGroupLabel>
-
             <SidebarGroupContent>
               <SidebarMenu class="cc-sidebar-menu">
                 <SidebarMenuItem
@@ -212,7 +194,6 @@ function sair() {
                         class="cc-sidebar-menu-icon"
                       />
                     </span>
-
                     <span class="cc-sidebar-text">
                       {{ item.label }}
                     </span>
@@ -226,7 +207,6 @@ function sair() {
 
         <SidebarFooter class="cc-sidebar-footer">
           <div class="cc-sidebar-footer-actions">
-
             <button
               class="cc-sidebar-footer-button cc-sidebar-collapse-button"
               type="button"
@@ -239,7 +219,6 @@ function sair() {
                   v-if="sidebarAberta"
                   size="18"
                 />
-
                 <ChevronRight
                   v-else
                   size="18"
@@ -273,7 +252,6 @@ function sair() {
                   v-if="temaAtual === 'light'"
                   size="19"
                 />
-
                 <Sun
                   v-else
                   size="19"
@@ -286,22 +264,6 @@ function sair() {
                     ? 'Tema escuro'
                     : 'Tema claro'
                 }}
-              </span>
-            </button>
-
-            <button
-              class="cc-sidebar-footer-button"
-              type="button"
-              :title="sidebarAberta ? null : 'Modo Aluno'"
-              aria-label="Trocar para modo Aluno"
-              @click="trocarParaAluno"
-            >
-              <span class="cc-sidebar-icon">
-                <ArrowRightArrowLeft size="19" />
-              </span>
-
-              <span class="cc-sidebar-text">
-                Modo Aluno
               </span>
             </button>
 
@@ -339,7 +301,6 @@ function sair() {
 
           </div>
         </SidebarFooter>
-
       </SidebarPanel>
     </SidebarAside>
   </Sidebar>
