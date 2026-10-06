@@ -1,0 +1,302 @@
+.salas-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.salas-header {
+  margin-bottom: 32px;
+}
+
+.salas-header > span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.salas-header h1 {
+  margin: 0;
+}
+
+.salas-header p {
+  margin: 10px 0 0;
+  opacity: 0.7;
+}
+
+.salas-state {
+  padding: 32px 0;
+}
+
+.salas-state--error {
+  color: var(--color-danger);
+}
+
+.salas-state button {
+  margin-top: 12px;
+}
+
+.salas-toolbar {
+  max-width: 520px;
+  margin-bottom: 32px;
+}
+
+.salas-toolbar label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.salas-toolbar input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+}
+
+.salas-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.salas-section-header h2 {
+  margin: 0;
+}
+
+.salas-section-header span {
+  min-width: 24px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--color-surface-secondary);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.salas-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sala-card {
+  display: flex;
+  min-height: 180px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sala-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.sala-card-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+.sala-card h3 {
+  margin: 0;
+}
+
+.sala-card p {
+  margin: 10px 0 0;
+  line-height: 1.5;
+  opacity: 0.68;
+}
+
+.sala-card-arrow {
+  font-size: 1.2rem;
+}
+
+.salas-empty {
+  padding: 32px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 12px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+@media (max-width: 950px) {
+  .salas-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .salas-page {
+    padding: 24px;
+  }
+
+  .salas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================================================
+   UX POLISH
+   ================================================== */
+
+.salas-page {
+  color: var(--color-text);
+}
+
+.salas-header > span,
+.sala-card-label {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+.salas-header h1,
+.salas-section-header h2,
+.sala-card h3 {
+  color: var(--color-text);
+}
+
+.salas-header p,
+.sala-card p {
+  color: var(--color-text-secondary);
+  opacity: 1;
+}
+
+.salas-toolbar {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.salas-toolbar label {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.salas-toolbar input {
+  box-sizing: border-box;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.salas-toolbar input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.salas-toolbar input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.salas-toolbar input:focus {
+  outline: 0;
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-border-soft);
+}
+
+.salas-section-header span {
+  color: var(--color-text-secondary);
+}
+
+.sala-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.sala-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.18s ease;
+}
+
+.sala-card:hover {
+  border-color: var(--color-primary-border-medium);
+  background: var(--color-surface-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.sala-card:hover::before {
+  transform: scaleY(1);
+}
+
+.sala-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.sala-card-arrow {
+  color: var(--color-text-muted);
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.sala-card:hover .sala-card-arrow {
+  color: var(--color-primary);
+  transform: translateX(4px);
+}
+
+.salas-empty {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  opacity: 1;
+}
+
+.salas-state--error {
+  border: 1px solid var(--color-danger-border);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--color-danger-soft);
+}
+
+.salas-state--error button {
+  border: 1px solid var(--color-danger-border);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  background: var(--color-surface);
+  color: var(--color-danger);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sala-card,
+  .sala-card::before,
+  .sala-card-arrow {
+    transition: none;
+  }
+}
