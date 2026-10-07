@@ -9,14 +9,22 @@ import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 
 import SidebarProfessor from '../../components/sidebarProfessor.vue'
+import ClassroomDialog from '../../components/ClassroomDialog.vue'
 
-import { buscarSalas } from './service'
+import {
+  buscarSalas,
+  criarSala
+} from './service'
 
 const salas = ref([])
 const busca = ref('')
 
 const carregando = ref(true)
 const erro = ref('')
+
+const classroomDialogVisible = ref(false)
+const salvandoSala = ref(false)
+const erroClassroomDialog = ref('')
 
 function normalizarTexto(valor) {
   return String(valor || '')
@@ -43,6 +51,36 @@ const salasFiltradas = computed(() => {
 function abrirSala(sala) {
   window.location.href =
     `/sala.html?id=${encodeURIComponent(sala.id)}`
+}
+
+function abrirDialogCriacao() {
+  erroClassroomDialog.value = ''
+  classroomDialogVisible.value = true
+}
+
+async function criarNovaSala(payload) {
+  erroClassroomDialog.value = ''
+  salvandoSala.value = true
+
+  try {
+    const novaSala = await criarSala(payload)
+
+    classroomDialogVisible.value = false
+
+    window.location.href =
+      `/sala.html?id=${encodeURIComponent(
+        novaSala.id
+      )}`
+  } catch (error) {
+    console.error(error)
+
+    erroClassroomDialog.value =
+      error instanceof Error
+        ? error.message
+        : 'Não foi possível criar a sala.'
+  } finally {
+    salvandoSala.value = false
+  }
 }
 
 async function carregarSalas() {
@@ -73,14 +111,25 @@ onMounted(carregarSalas)
     <SidebarMain>
       <main class="salas-page">
         <header class="salas-header">
-          <span>// SALAS</span>
+          <div class="salas-header-copy">
+            <span>// SALAS</span>
 
-          <h1>Suas salas</h1>
+            <h1>Suas salas</h1>
 
-          <p>
-            Acesse as turmas das quais você participa
-            como professor.
-          </p>
+            <p>
+              Acesse as turmas das quais você participa
+              como professor.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="salas-create-button"
+            @click="abrirDialogCriacao"
+          >
+            <span aria-hidden="true">+</span>
+            Nova sala
+          </button>
         </header>
 
         <section
@@ -175,14 +224,41 @@ onMounted(carregarSalas)
 
             <div
               v-else
-              class="salas-empty"
+              class="salas-empty salas-empty--create"
             >
-              Nenhuma sala encontrada.
+              <span class="salas-empty-kicker">
+                // PRIMEIRA SALA
+              </span>
+
+              <strong>
+                Você ainda não possui salas.
+              </strong>
+
+              <p>
+                Crie uma sala para organizar alunos,
+                atividades e entregas.
+              </p>
+
+              <button
+                type="button"
+                class="salas-empty-button"
+                @click="abrirDialogCriacao"
+              >
+                Criar primeira sala
+              </button>
             </div>
           </section>
         </template>
       </main>
     </SidebarMain>
+
+    <ClassroomDialog
+      v-model:visible="classroomDialogVisible"
+      mode="create"
+      :saving="salvandoSala"
+      :error="erroClassroomDialog"
+      @submit="criarNovaSala"
+    />
   </SidebarLayout>
 </template>
 

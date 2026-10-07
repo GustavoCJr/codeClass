@@ -733,3 +733,22 @@
     transition: none;
   }
 }
+
+/* ==================================================
+   MATRÍCULA DE ALUNOS
+   ================================================== */
+
+.classroom-section-heading > .classroom-primary-button {
+  flex: 0 0 auto;
+}
+
+.classroom-empty > .classroom-primary-button {
+  margin-top: 0.85rem;
+}
+
+@media (max-width: 650px) {
+  .classroom-section-heading >
+    .classroom-primary-button {
+    width: 100%;
+  }
+}

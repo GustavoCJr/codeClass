@@ -2,6 +2,7 @@ import Sala from './sala.vue'
 
 import { createPageApp } from '../../config/createPageApp'
 import { obterUsuarioAtual } from '../../config/auth'
+import { definirContextoSala } from './service'
 
 async function iniciarPagina() {
   const usuarioAtual = await obterUsuarioAtual()
@@ -21,6 +22,8 @@ async function iniciarPagina() {
     window.location.href = '/login.html'
     return
   }
+
+  definirContextoSala(usuarioAtual.perfil)
 
   createPageApp(Sala)
 }

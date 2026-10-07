@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -13,7 +14,8 @@ const props = defineProps({
   mode: {
     type: String,
     default: 'create',
-    validator: (value) => ['create', 'edit'].includes(value)
+    validator: (value) =>
+      ['create', 'edit'].includes(value)
   },
 
   classroom: {
@@ -42,7 +44,9 @@ const descricao = ref('')
 const nomeTocado = ref(false)
 
 const titulo = computed(() => {
-  return props.mode === 'edit' ? 'Editar sala' : 'Nova sala'
+  return props.mode === 'edit'
+    ? 'Editar sala'
+    : 'Nova sala'
 })
 
 const descricaoTitulo = computed(() => {
@@ -53,33 +57,78 @@ const descricaoTitulo = computed(() => {
 
 const textoAcao = computed(() => {
   if (props.saving) {
-    return props.mode === 'edit' ? 'Salvando...' : 'Criando...'
+    return props.mode === 'edit'
+      ? 'Salvando...'
+      : 'Criando sala...'
   }
 
-  return props.mode === 'edit' ? 'Salvar alterações' : 'Criar sala'
+  return props.mode === 'edit'
+    ? 'Salvar alterações'
+    : 'Criar sala'
 })
 
-const nomeInvalido = computed(() => {
-  return nomeTocado.value && !nome.value.trim()
+const nomeNormalizado = computed(() =>
+  nome.value.trim()
+)
+
+const erroNome = computed(() => {
+  if (!nomeTocado.value) {
+    return ''
+  }
+
+  if (!nomeNormalizado.value) {
+    return 'Informe o nome da sala.'
+  }
+
+  if (nomeNormalizado.value.length < 3) {
+    return 'Use pelo menos 3 caracteres.'
+  }
+
+  if (nomeNormalizado.value.length > 255) {
+    return 'Use no máximo 255 caracteres.'
+  }
+
+  return ''
 })
+
+const nomeInvalido = computed(() =>
+  Boolean(erroNome.value)
+)
 
 const podeSalvar = computed(() => {
-  return Boolean(nome.value.trim()) && !props.saving
+  return (
+    nomeNormalizado.value.length >= 3 &&
+    nomeNormalizado.value.length <= 255 &&
+    !props.saving
+  )
 })
 
 const modelVisible = computed({
   get: () => props.visible,
-  set: (value) => emit('update:visible', value)
+  set: (value) =>
+    emit('update:visible', value)
 })
 
 function preencherFormulario() {
-  nome.value = props.classroom?.nome ?? props.classroom?.name ?? ''
-  descricao.value = props.classroom?.descricao ?? props.classroom?.description ?? ''
+  nome.value =
+    props.classroom?.nome ??
+    props.classroom?.name ??
+    ''
+
+  descricao.value =
+    props.classroom?.descricao ??
+    props.classroom?.description ??
+    ''
+
   nomeTocado.value = false
 }
 
 watch(
-  () => [props.visible, props.classroom, props.mode],
+  () => [
+    props.visible,
+    props.classroom,
+    props.mode
+  ],
   ([visible]) => {
     if (visible) {
       preencherFormulario()
@@ -105,7 +154,7 @@ function enviarFormulario() {
 
   emit('submit', {
     id: props.classroom?.id ?? null,
-    nome: nome.value.trim(),
+    nome: nomeNormalizado.value,
     descricao: descricao.value.trim()
   })
 }
@@ -124,7 +173,11 @@ function enviarFormulario() {
     <template #header>
       <div class="classroom-dialog-header">
         <span class="classroom-dialog-kicker">
-          {{ mode === 'edit' ? '// EDITAR TURMA' : '// NOVA TURMA' }}
+          {{
+            mode === 'edit'
+              ? '// EDITAR TURMA'
+              : '// NOVA TURMA'
+          }}
         </span>
 
         <div>
@@ -149,16 +202,24 @@ function enviarFormulario() {
           v-model="nome"
           :disabled="saving"
           :invalid="nomeInvalido"
+          maxlength="255"
           autocomplete="off"
           placeholder="Ex.: Estrutura de Dados"
           @blur="nomeTocado = true"
         />
 
         <small
-          v-if="nomeInvalido"
+          v-if="erroNome"
           class="classroom-dialog-field-error"
         >
-          Informe o nome da sala.
+          {{ erroNome }}
+        </small>
+
+        <small
+          v-else
+          class="classroom-dialog-field-help"
+        >
+          Mínimo de 3 caracteres.
         </small>
       </div>
 
@@ -174,7 +235,7 @@ function enviarFormulario() {
           :disabled="saving"
           rows="5"
           auto-resize
-          placeholder="Descreva brevemente o objetivo ou contexto desta turma."
+          placeholder="Ex.: Grafos, árvores e algoritmos"
         />
       </div>
 

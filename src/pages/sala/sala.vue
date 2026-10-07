@@ -2,7 +2,8 @@
 import {
   computed,
   onMounted,
-  ref
+  ref,
+  watch
 } from 'vue'
 
 import SidebarLayout from 'primevue/sidebarlayout'
@@ -10,8 +11,13 @@ import SidebarMain from 'primevue/sidebarmain'
 
 import SidebarProfessor from '../../components/sidebarProfessor.vue'
 import ActivityDialog from '../../components/classroom/ActivityDialog.vue'
+import AddStudentDialog from '../../components/classroom/AddStudentDialog.vue'
 
-import { buscarPaginaSala } from './service'
+import {
+  buscarAlunosOrganizacao,
+  buscarPaginaSala,
+  matricularAluno
+} from './service'
 
 const dados = ref(null)
 const carregando = ref(true)
@@ -37,6 +43,16 @@ const abaAtiva = ref(obterAbaInicial())
 const buscaAluno = ref('')
 
 const activityDialogVisible = ref(false)
+
+const addStudentDialogVisible = ref(false)
+const buscaCandidato = ref('')
+const candidatosAluno = ref([])
+const carregandoCandidatos = ref(false)
+const erroCandidatos = ref('')
+const alunoAdicionandoId = ref(null)
+
+let timerBuscaCandidatos = null
+let sequenciaBuscaCandidatos = 0
 
 function obterIdSala() {
   return new URLSearchParams(
@@ -112,6 +128,13 @@ const alunosFiltrados = computed(() => {
       `${aluno.full_name} ${aluno.email}`
     ).includes(termo)
   })
+})
+
+const idsAlunosMatriculados = computed(() => {
+  return new Set(
+    (dados.value?.membros?.students || [])
+      .map((aluno) => aluno.student_id)
+  )
 })
 
 function formatarData(
@@ -207,6 +230,148 @@ function continuarNovaTarefa(dadosIniciais) {
   window.location.href =
     '/criarTarefa.html'
 }
+
+function abrirAdicionarAluno() {
+  buscaCandidato.value = ''
+  candidatosAluno.value = []
+  erroCandidatos.value = ''
+  addStudentDialogVisible.value = true
+
+  carregarCandidatos('')
+}
+
+async function carregarCandidatos(
+  termo = buscaCandidato.value
+) {
+  const buscaAtual =
+    ++sequenciaBuscaCandidatos
+
+  carregandoCandidatos.value = true
+  erroCandidatos.value = ''
+
+  try {
+    const membros =
+      await buscarAlunosOrganizacao(termo)
+
+    if (
+      buscaAtual !==
+      sequenciaBuscaCandidatos
+    ) {
+      return
+    }
+
+    candidatosAluno.value =
+      membros.filter(
+        (membro) =>
+          !idsAlunosMatriculados.value.has(
+            membro.user_id
+          )
+      )
+  } catch (error) {
+    if (
+      buscaAtual !==
+      sequenciaBuscaCandidatos
+    ) {
+      return
+    }
+
+    console.error(error)
+
+    erroCandidatos.value =
+      error instanceof Error
+        ? error.message
+        : 'Não foi possível buscar os alunos.'
+  } finally {
+    if (
+      buscaAtual ===
+      sequenciaBuscaCandidatos
+    ) {
+      carregandoCandidatos.value = false
+    }
+  }
+}
+
+async function adicionarAluno(aluno) {
+  if (!aluno?.user_id) {
+    return
+  }
+
+  alunoAdicionandoId.value =
+    aluno.user_id
+
+  erroCandidatos.value = ''
+
+  try {
+    const matricula = await matricularAluno(
+      classroomId,
+      aluno.user_id
+    )
+
+    const jaExiste =
+      idsAlunosMatriculados.value.has(
+        matricula.student_id
+      )
+
+    if (!jaExiste) {
+      dados.value.membros.students.push(
+        matricula
+      )
+    }
+
+    dados.value.sala.total_students =
+      dados.value.membros.students.length
+
+    addStudentDialogVisible.value = false
+  } catch (error) {
+    console.error(error)
+
+    erroCandidatos.value =
+      error instanceof Error
+        ? error.message
+        : 'Não foi possível adicionar o aluno.'
+  } finally {
+    alunoAdicionandoId.value = null
+  }
+}
+
+watch(
+  buscaCandidato,
+  (termo) => {
+    if (!addStudentDialogVisible.value) {
+      return
+    }
+
+    window.clearTimeout(
+      timerBuscaCandidatos
+    )
+
+    timerBuscaCandidatos =
+      window.setTimeout(
+        () => carregarCandidatos(termo),
+        320
+      )
+  }
+)
+
+watch(
+  addStudentDialogVisible,
+  (visible) => {
+    if (visible) {
+      return
+    }
+
+    window.clearTimeout(
+      timerBuscaCandidatos
+    )
+
+    sequenciaBuscaCandidatos += 1
+
+    buscaCandidato.value = ''
+    candidatosAluno.value = []
+    erroCandidatos.value = ''
+    carregandoCandidatos.value = false
+  }
+)
 
 async function carregarSala() {
   if (!classroomId) {
@@ -643,6 +808,14 @@ onMounted(carregarSala)
                   }}
                 </p>
               </div>
+
+              <button
+                type="button"
+                class="classroom-primary-button"
+                @click="abrirAdicionarAluno"
+              >
+                + Adicionar aluno
+              </button>
             </div>
 
             <article class="classroom-teacher">
@@ -741,13 +914,29 @@ onMounted(carregarSala)
               class="classroom-empty"
             >
               <span>
-                // NENHUM ALUNO ENCONTRADO
+                {{
+                  buscaAluno
+                    ? '// NENHUM ALUNO ENCONTRADO'
+                    : '// SEM ALUNOS'
+                }}
               </span>
 
               <h3>
-                Nenhum participante corresponde
-                à busca.
+                {{
+                  buscaAluno
+                    ? 'Nenhum participante corresponde à busca.'
+                    : 'Esta sala ainda não possui alunos matriculados.'
+                }}
               </h3>
+
+              <button
+                v-if="!buscaAluno"
+                type="button"
+                class="classroom-primary-button"
+                @click="abrirAdicionarAluno"
+              >
+                Adicionar primeiro aluno
+              </button>
             </div>
           </section>
         </template>
@@ -756,6 +945,16 @@ onMounted(carregarSala)
       <ActivityDialog
         v-model:visible="activityDialogVisible"
         @continue="continuarNovaTarefa"
+      />
+
+      <AddStudentDialog
+        v-model:visible="addStudentDialogVisible"
+        v-model:search="buscaCandidato"
+        :students="candidatosAluno"
+        :loading="carregandoCandidatos"
+        :adding-id="alunoAdicionandoId"
+        :error="erroCandidatos"
+        @add="adicionarAluno"
       />
     </SidebarMain>
   </SidebarLayout>

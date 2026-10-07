@@ -2,6 +2,7 @@ import SalasProfessor from './salasProfessor.vue'
 
 import { createPageApp } from '../../config/createPageApp'
 import { obterUsuarioAtual } from '../../config/auth'
+import { definirContextoSalas } from './service'
 
 async function iniciarPagina() {
   const usuarioAtual = await obterUsuarioAtual()
@@ -21,6 +22,8 @@ async function iniciarPagina() {
     window.location.href = '/login.html'
     return
   }
+
+  definirContextoSalas(usuarioAtual.perfil)
 
   createPageApp(SalasProfessor)
 }
