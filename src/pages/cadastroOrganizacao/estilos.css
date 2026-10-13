@@ -1,0 +1,707 @@
+/* ==================================================
+   CADASTRO DE ORGANIZAÇÃO
+   Base visual alinhada à identidade visual do CodeClass
+   ================================================== */
+
+.cadastro-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+/* ==================================================
+   ÁREA DE MARCA (COLUNA ESQUERDA)
+   ================================================== */
+
+.cadastro-brand {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  flex: 1 1 50%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100vh;
+  padding: 56px 48px;
+
+  background: var(--color-background);
+  border-right: 1px solid var(--color-border);
+}
+
+.cadastro-brand::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(100% - 1px),
+      var(--color-border) calc(100% - 1px)
+    );
+  background-size: 64px 64px;
+
+  opacity: 0.28;
+}
+
+.cadastro-brand::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+
+  width: 360px;
+  height: 360px;
+  right: -190px;
+  bottom: -190px;
+
+  border: 1px solid var(--color-primary-border-soft);
+  transform: rotate(45deg);
+}
+
+.cadastro-brand-content {
+  width: min(100%, 540px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.cadastro-brand-mark {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 2.5vw, 28px);
+}
+
+.cadastro-code-bracket {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: clamp(60px, 8vw, 110px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.08em;
+}
+
+.cadastro-logo-frame {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: clamp(200px, 24vw, 360px);
+  aspect-ratio: 1;
+
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.cadastro-logo-frame img {
+  display: block;
+
+  width: 82%;
+  height: 82%;
+
+  object-fit: contain;
+}
+
+.cadastro-brand-name {
+  margin-top: 20px;
+
+  color: var(--color-text);
+  font-size: clamp(34px, 4vw, 54px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.cadastro-brand-name strong {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.cadastro-brand-copy {
+  max-width: 440px;
+  margin: 20px auto 0;
+
+  color: var(--color-text-secondary);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.cadastro-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+  text-align: left;
+  width: 100%;
+  max-width: 460px;
+}
+
+.cadastro-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 13.5px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.cadastro-feature-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ==================================================
+   ÁREA DO FORMULÁRIO (COLUNA DIREITA)
+   ================================================== */
+
+.cadastro-form-area {
+  flex: 1 1 50%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100vh;
+  padding: 32px 24px;
+
+  background: var(--color-background);
+  overflow-y: auto;
+}
+
+.cadastro-card {
+  width: min(100%, 580px);
+  margin: auto;
+  padding: 40px 42px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.cadastro-header {
+  margin: 0;
+}
+
+.cadastro-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cadastro-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: color 0.16s ease;
+}
+
+.cadastro-back-link:hover {
+  color: var(--color-primary);
+}
+
+.cadastro-eyebrow {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.cadastro-header h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(26px, 3.2vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.cadastro-header p {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.cadastro-card-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ==================================================
+   SEÇÕES DO FORMULÁRIO
+   ================================================== */
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+}
+
+.section-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cadastro-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .cadastro-field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cadastro-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cadastro-field label {
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.cadastro-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cadastro-input-wrap input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 42px 0 42px;
+
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  outline: 0;
+
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  font-size: 13.5px;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.cadastro-input-wrap input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.cadastro-input-wrap input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.cadastro-input-wrap input:focus {
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-border-soft);
+}
+
+.cadastro-input-wrap input:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.cadastro-input-icon {
+  position: absolute;
+  left: 14px;
+  z-index: 1;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.cadastro-password-toggle {
+  position: absolute;
+  right: 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+  padding: 0;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.cadastro-password-toggle:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.cadastro-password-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cadastro-password-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.slug-preview {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 2px 0;
+}
+
+.slug-preview code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.field-validation-error {
+  margin: 0;
+  font-size: 12px;
+  color: #d32f2f;
+}
+
+/* ==================================================
+   TERMOS E SUBMISSÃO
+   ================================================== */
+
+.cadastro-terms {
+  margin-top: 4px;
+}
+
+.cadastro-terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.cadastro-terms-label input {
+  margin-top: 3px;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.cadastro-feedback {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.cadastro-feedback--error {
+  border: 1px solid #e0a4a4;
+  background: #fff2f2;
+  color: #8c2424;
+}
+
+[data-theme="dark"] .cadastro-feedback--error {
+  border-color: #713d3d;
+  background: #2b1818;
+  color: #f3b7b7;
+}
+
+.cadastro-submit.p-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+
+  justify-content: center;
+
+  border: 1px solid var(--color-primary);
+  border-radius: 10px;
+
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+
+  font-weight: 700;
+  font-size: 14px;
+
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.cadastro-submit.p-button:not(:disabled):hover {
+  transform: translateY(-1px);
+
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
+
+.cadastro-submit.p-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.cadastro-submit.p-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cadastro-footer {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.cadastro-footer a {
+  color: var(--color-link);
+  font-weight: 600;
+}
+
+.cadastro-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ==================================================
+   ESTADO DE SUCESSO
+   ================================================== */
+
+.cadastro-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 8px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cadastro-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.cadastro-success-box h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+}
+
+.cadastro-success-text {
+  margin: 12px 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 420px;
+}
+
+.cadastro-success-text strong {
+  color: var(--color-text);
+}
+
+.cadastro-success-details {
+  width: 100%;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.cadastro-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.cadastro-detail-item .label {
+  color: var(--color-text-muted);
+}
+
+.cadastro-detail-item .value {
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--color-text);
+}
+
+.cadastro-redirect-countdown {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.cadastro-redirect-countdown strong {
+  color: var(--color-primary);
+}
+
+/* ==================================================
+   RESPONSIVIDADE
+   ================================================== */
+
+@media (max-width: 960px) {
+  .cadastro-page {
+    flex-direction: column;
+  }
+
+  .cadastro-brand {
+    flex: 0 0 auto;
+    min-height: auto;
+    padding: 40px 24px 32px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .cadastro-brand-copy {
+    font-size: 13.5px;
+  }
+
+  .cadastro-features {
+    display: none;
+  }
+
+  .cadastro-logo-frame {
+    width: 140px;
+  }
+
+  .cadastro-code-bracket {
+    font-size: 48px;
+  }
+
+  .cadastro-form-area {
+    padding: 24px 16px;
+  }
+
+  .cadastro-card {
+    padding: 28px 20px;
+    border-radius: 20px;
+  }
+}
