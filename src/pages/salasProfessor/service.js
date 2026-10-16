@@ -8,6 +8,10 @@ export function definirContextoSalas(perfil) {
   perfilAtual = perfil
 }
 
+export function alunoNaPaginaSalas() {
+  return perfilAtual?.role === 'student'
+}
+
 async function obterSessao() {
   const {
     data: { session },

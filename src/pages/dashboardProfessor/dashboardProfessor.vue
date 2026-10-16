@@ -1,4 +1,8 @@
 <script setup>
+import { useProfessorNavigation } from '../../router/professorNavigation'
+const navegar = useProfessorNavigation()
+const props = defineProps({ embedded: { type: Boolean, default: false } })
+
 import { onMounted, ref } from 'vue'
 
 import Button from 'primevue/button'
@@ -30,18 +34,6 @@ onMounted(async () => {
   }
 })
 
-function obterIniciais(nome) {
-  if (!nome) return ''
-
-  return nome
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0])
-    .join('')
-    .toUpperCase()
-}
-
 function abrirNovaTarefa() {
   activityDialogVisible.value = true
 }
@@ -54,15 +46,15 @@ function continuarNovaTarefa(dadosIniciais) {
 
   activityDialogVisible.value = false
 
-  window.location.href = '/criarTarefa.html'
+  navegar('/criarTarefa.html')
 }
 </script>
 
 <template>
-  <SidebarLayout class="dashboard-layout">
-    <SidebarProfessor />
+  <component :is="embedded ? 'div' : SidebarLayout" class="dashboard-layout">
+    <SidebarProfessor v-if="!embedded" />
 
-    <SidebarMain>
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="dashboard-content">
         <section
           v-if="carregando"
@@ -102,6 +94,9 @@ function continuarNovaTarefa(dadosIniciais) {
         </section>
 
         <template v-else>
+          <p v-if="dados.avisos.length" class="dashboard-error" role="status">
+            {{ dados.avisos.join(' ') }}
+          </p>
           <header class="dashboard-hero">
             <div class="dashboard-hero-copy">
               <div class="dashboard-eyebrow">
@@ -158,41 +153,12 @@ function continuarNovaTarefa(dadosIniciais) {
             aria-label="Resumo da dashboard"
           >
             <article class="dashboard-metric">
-              <strong>
-                {{
-                  String(
-                    dados.indicadores.salasAtivas
-                  ).padStart(2, '0')
-                }}
-              </strong>
-
-              <span>SALAS ATIVAS</span>
+              <strong>{{ dados.indicadores.salasAtivas ?? '—' }}</strong>
+              <span>MINHAS SALAS</span>
             </article>
-
-            <article class="dashboard-metric">
-              <strong>
-                {{ dados.indicadores.totalAlunos }}
-              </strong>
-
-              <span>ALUNOS</span>
-            </article>
-
-            <article
-              class="dashboard-metric dashboard-metric--attention"
-            >
-              <strong>
-                {{ dados.indicadores.correcoesPendentes }}
-              </strong>
-
+            <article class="dashboard-metric dashboard-metric--attention">
+              <strong>{{ dados.indicadores.correcoesPendentes ?? '—' }}</strong>
               <span>PARA CORRIGIR</span>
-            </article>
-
-            <article class="dashboard-metric">
-              <strong>
-                {{ dados.indicadores.entregasHoje }}
-              </strong>
-
-              <span>ENTREGAS HOJE</span>
             </article>
           </section>
 
@@ -205,8 +171,10 @@ function continuarNovaTarefa(dadosIniciais) {
             <div class="dashboard-focus-body">
               <div class="dashboard-focus-copy">
                 <p class="dashboard-focus-count">
-                  {{ dados.focoPrincipal.quantidade }}
-                  entregas aguardam sua avaliação.
+                  <template v-if="dados.focoPrincipal.tipo === 'correcao'">
+                    {{ dados.focoPrincipal.quantidade }} entregas aguardam sua avaliação.
+                  </template>
+                  <template v-else>{{ dados.focoPrincipal.sala }}</template>
                 </p>
 
                 <h2>
@@ -289,7 +257,7 @@ function continuarNovaTarefa(dadosIniciais) {
 
                 <a
                   class="section-link"
-                  :href="dados.links.todasTarefas"
+                  :href="'/correcoes.html'"
                 >
                   Ver todas
 
@@ -350,161 +318,21 @@ function continuarNovaTarefa(dadosIniciais) {
                 v-else
                 class="dashboard-panel-empty"
               >
-                Nenhuma correção pendente.
+                {{ dados.avisos.some(aviso => aviso.includes('correções')) ? 'Correções indisponíveis no momento.' : 'Nenhuma correção pendente.' }}
               </p>
             </section>
 
-            <section
-              class="dashboard-section dashboard-panel"
-            >
-              <div
-                class="section-heading section-heading--compact"
-              >
-                <div class="section-heading-copy">
-                  <span class="section-number">
-                    03
-                  </span>
 
-                  <h2>Atividade recente</h2>
-                </div>
-              </div>
-
-              <div
-                v-if="dados.entregasRecentes.length"
-                class="submission-list"
-              >
-                <article
-                  v-for="entrega in dados.entregasRecentes"
-                  :key="entrega.id"
-                  class="submission-item"
-                >
-                  <div
-                    class="submission-avatar"
-                    aria-hidden="true"
-                  >
-                    {{
-                      obterIniciais(
-                        entrega.aluno
-                      )
-                    }}
-                  </div>
-
-                  <div class="submission-copy">
-                    <p class="submission-message">
-                      <strong>
-                        {{ entrega.aluno }}
-                      </strong>
-
-                      enviou
-
-                      <span>
-                        {{ entrega.atividade }}
-                      </span>
-                    </p>
-
-                    <small>
-                      {{ entrega.sala }}
-                    </small>
-                  </div>
-
-                  <time
-                    class="submission-time"
-                    :datetime="entrega.enviadoEm"
-                  >
-                    {{ entrega.tempo }}
-                  </time>
-                </article>
-              </div>
-
-              <p
-                v-else
-                class="dashboard-panel-empty"
-              >
-                Nenhuma entrega recente.
-              </p>
-            </section>
           </div>
 
-          <section
-            class="dashboard-section deadlines-section"
-          >
-            <div class="section-heading">
-              <div class="section-heading-copy">
-                <span class="section-number">
-                  04
-                </span>
 
-                <h2>Próximos prazos</h2>
-              </div>
-
-              <a
-                class="section-link"
-                :href="dados.links.todasTarefas"
-              >
-                Ver tarefas
-
-                <span aria-hidden="true">→</span>
-              </a>
-            </div>
-
-            <div
-              v-if="dados.proximosPrazos.length"
-              class="deadline-list"
-            >
-              <article
-                v-for="prazo in dados.proximosPrazos"
-                :key="prazo.id"
-                class="deadline-item"
-              >
-                <time
-                  class="deadline-date"
-                  :datetime="prazo.prazo"
-                >
-                  <span>
-                    {{ prazo.dataCurta }}
-                  </span>
-
-                  <strong>
-                    {{ prazo.hora }}
-                  </strong>
-                </time>
-
-                <div class="deadline-copy">
-                  <h3>
-                    {{ prazo.atividade }}
-                  </h3>
-
-                  <p>
-                    {{ prazo.sala }}
-                  </p>
-                </div>
-
-                <span
-                  class="deadline-status"
-                  :class="{
-                    'deadline-status--urgent':
-                      prazo.urgente
-                  }"
-                >
-                  {{ prazo.status }}
-                </span>
-              </article>
-            </div>
-
-            <p
-              v-else
-              class="dashboard-panel-empty"
-            >
-              Não há prazos próximos.
-            </p>
-          </section>
         </template>
       </main>
-    </SidebarMain>
+    </component>
 
     <ActivityDialog
       v-model:visible="activityDialogVisible"
       @continue="continuarNovaTarefa"
     />
-  </SidebarLayout>
+  </component>
 </template>

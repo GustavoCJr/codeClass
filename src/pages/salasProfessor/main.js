@@ -17,7 +17,8 @@ async function iniciarPagina() {
   if (
     role !== 'owner' &&
     role !== 'admin' &&
-    role !== 'teacher'
+    role !== 'teacher' &&
+    role !== 'student'
   ) {
     window.location.href = '/login.html'
     return

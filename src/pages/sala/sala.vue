@@ -1,4 +1,10 @@
 <script setup>
+import { inject } from 'vue'
+import { routeLocationKey, onBeforeRouteLeave } from 'vue-router'
+import { useProfessorNavigation } from '../../router/professorNavigation'
+const props = defineProps({ embedded: { type: Boolean, default: false } })
+const route = inject(routeLocationKey, null)
+const navegar = useProfessorNavigation()
 import {
   computed,
   onMounted,
@@ -10,28 +16,35 @@ import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 
 import SidebarProfessor from '../../components/sidebarProfessor.vue'
+import SidebarAluno from '../../components/sidebarAluno.vue'
 import ActivityDialog from '../../components/classroom/ActivityDialog.vue'
 import AddStudentDialog from '../../components/classroom/AddStudentDialog.vue'
+import ClassroomManagement from '../../components/classroom/ClassroomManagement.vue'
+import AssignmentQuickActions from '../../components/assignment/AssignmentQuickActions.vue'
+import StudentQuickActions from '../../components/classroom/StudentQuickActions.vue'
+import { Users, UserPlus, ListCheck, FileEdit, Search, Calendar, Book } from '@primeicons/vue'
 
 import {
   buscarAlunosOrganizacao,
   buscarPaginaSala,
-  matricularAluno
+  matricularAluno,
+  alunoNaPaginaSala
 } from './service'
 
+const aluno = alunoNaPaginaSala()
 const dados = ref(null)
 const carregando = ref(true)
 const erro = ref('')
 
 function obterAbaInicial() {
   const tab = new URLSearchParams(
-    window.location.search
+    (route?.query ? new URLSearchParams(route.query).toString() : window.location.search)
   ).get('tab')
 
   if (
     tab === 'geral' ||
     tab === 'atividades' ||
-    tab === 'alunos'
+    (tab === 'alunos' && !aluno)
   ) {
     return tab
   }
@@ -41,6 +54,10 @@ function obterAbaInicial() {
 
 const abaAtiva = ref(obterAbaInicial())
 const buscaAluno = ref('')
+const buscaAtividade = ref('')
+const filtroTipoAtividade = ref('todos')
+const filtroPrazoAtividade = ref('todos')
+const ordemAtividade = ref('prazo')
 
 const activityDialogVisible = ref(false)
 
@@ -56,7 +73,7 @@ let sequenciaBuscaCandidatos = 0
 
 function obterIdSala() {
   return new URLSearchParams(
-    window.location.search
+    (route?.query ? new URLSearchParams(route.query).toString() : window.location.search)
   ).get('id')
 }
 
@@ -86,11 +103,54 @@ const atividadesOrdenadas = computed(() => {
   )
 })
 
+function dataValida(valor) {
+  if (!valor) return null
+  const timestamp = Date.parse(valor)
+  return Number.isFinite(timestamp) ? timestamp : null
+}
+
+const atividadesVisiveis = computed(() => {
+  // A visualização do aluno continua com o comportamento original.
+  if (aluno) return atividadesOrdenadas.value
+
+  const termo = normalizarTexto(buscaAtividade.value)
+  const agora = Date.now()
+  return [...(dados.value?.atividades || [])]
+    .filter((atividade) => {
+      if (termo && !normalizarTexto(`${atividade.title || ''} ${atividade.description || ''}`).includes(termo)) return false
+      if (filtroTipoAtividade.value !== 'todos' && atividade.type !== filtroTipoAtividade.value) return false
+
+      const prazo = dataValida(atividade.deadline)
+      const situacao = prazo === null ? 'sem-prazo' : prazo < agora ? 'encerrada' : 'andamento'
+      return filtroPrazoAtividade.value === 'todos' || filtroPrazoAtividade.value === situacao
+    })
+    .sort((a, b) => {
+      const prazoA = dataValida(a.deadline)
+      const prazoB = dataValida(b.deadline)
+      const criadoA = dataValida(a.created_at) ?? 0
+      const criadoB = dataValida(b.created_at) ?? 0
+      switch (ordemAtividade.value) {
+        case 'recentes': return criadoB - criadoA || String(a.id).localeCompare(String(b.id))
+        case 'antigas': return criadoA - criadoB || String(a.id).localeCompare(String(b.id))
+        case 'az': return String(a.title || '').localeCompare(String(b.title || ''), 'pt-BR')
+        case 'za': return String(b.title || '').localeCompare(String(a.title || ''), 'pt-BR')
+        default:
+          if (prazoA === null && prazoB === null) return criadoB - criadoA
+          if (prazoA === null) return 1
+          if (prazoB === null) return -1
+          return prazoA - prazoB || criadoB - criadoA
+      }
+    })
+})
+
 const proximasAtividades = computed(() => {
   const agora = new Date()
 
   return atividadesOrdenadas.value
     .filter((atividade) => {
+      if (aluno && statusAtividade(atividade).label === 'ENTREGUE') {
+        return false
+      }
       if (!atividade.deadline) {
         return false
       }
@@ -129,6 +189,17 @@ const alunosFiltrados = computed(() => {
     ).includes(termo)
   })
 })
+
+function iniciaisPessoa(nome) {
+  const partes = String(nome || '').trim().split(/\s+/).filter(Boolean)
+  return partes.slice(0, 2).map(parte => parte[0]).join('').toUpperCase() || '?'
+}
+
+function removerAlunoDaLista(studentId) {
+  if (!dados.value?.membros?.students) return
+  dados.value.membros.students = dados.value.membros.students.filter(item => item.student_id !== studentId)
+  dados.value.sala.total_students = dados.value.membros.students.length
+}
 
 const idsAlunosMatriculados = computed(() => {
   return new Set(
@@ -186,6 +257,20 @@ function formatarLiberacao(valor) {
 }
 
 function statusAtividade(atividade) {
+  if (aluno) {
+    const entregue = (dados.value?.submissoes || []).some(
+      (submissao) => submissao.assignment?.id === atividade.id &&
+        ['pending', 'awaiting_review', 'published'].includes(submissao.status)
+    )
+    const atrasada = !entregue && atividade.deadline &&
+      new Date(atividade.deadline) < new Date()
+
+    return {
+      label: entregue ? 'ENTREGUE' : atrasada ? 'ATRASADA' : 'PENDENTE',
+      encerrada: Boolean(atrasada),
+      entregue
+    }
+  }
   if (!atividade.deadline) {
     return {
       label: 'SEM PRAZO',
@@ -198,7 +283,7 @@ function statusAtividade(atividade) {
 
   return encerrada
     ? {
-        label: 'PRAZO ENCERRADO',
+        label: 'ENCERRADA',
         encerrada: true
       }
     : {
@@ -207,9 +292,29 @@ function statusAtividade(atividade) {
       }
 }
 
+function voltarSalas(event) {
+  event?.preventDefault()
+  navegar('/salas.html')
+}
+
+function iniciaisSala(nome) {
+  const palavras = String(nome || '').trim().split(/\s+/).filter(Boolean)
+  return (palavras.length > 1 ? palavras.slice(0, 2).map(p => p[0]).join('') : (palavras[0] || 'S').slice(0, 2)).toUpperCase()
+}
+
+function atualizarAtividade(atividade) {
+  if (!atividade?.id || !dados.value) return
+  const index = dados.value.atividades.findIndex(item => item.id === atividade.id)
+  if (index !== -1) dados.value.atividades.splice(index, 1, atividade)
+}
+
+function excluirAtividade(assignmentId) {
+  if (!dados.value) return
+  dados.value.atividades = dados.value.atividades.filter(item => item.id !== assignmentId)
+}
+
 function abrirAtividade(assignmentId) {
-  window.location.href =
-    `/atividade.html?id=${encodeURIComponent(assignmentId)}`
+  navegar(`/atividade.html?id=${encodeURIComponent(assignmentId)}`)
 }
 
 function abrirNovaTarefa() {
@@ -227,8 +332,7 @@ function continuarNovaTarefa(dadosIniciais) {
 
   activityDialogVisible.value = false
 
-  window.location.href =
-    '/criarTarefa.html'
+  navegar('/criarTarefa.html')
 }
 
 function abrirAdicionarAluno() {
@@ -404,10 +508,11 @@ onMounted(carregarSala)
 </script>
 
 <template>
-  <SidebarLayout>
-    <SidebarProfessor />
+  <component :is="embedded ? 'div' : SidebarLayout">
+    <SidebarAluno v-if="aluno && !embedded" />
+    <SidebarProfessor v-else-if="!embedded" />
 
-    <SidebarMain>
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="classroom-page">
         <div
           v-if="carregando"
@@ -423,7 +528,7 @@ onMounted(carregarSala)
           <span>// NÃO FOI POSSÍVEL ABRIR A SALA</span>
           <h1>{{ erro }}</h1>
 
-          <a href="/salas.html">
+          <a href="/salas.html" @click="voltarSalas">
             Voltar para salas
           </a>
         </div>
@@ -432,57 +537,40 @@ onMounted(carregarSala)
           <a
             href="/salas.html"
             class="classroom-back"
+            @click="voltarSalas"
           >
             ← Voltar para salas
           </a>
 
-          <header class="classroom-header">
+          <header class="classroom-header classroom-hero">
+            <div class="classroom-identity" aria-hidden="true">
+              {{ iniciaisSala(dados.sala.name) }}
+            </div>
             <div class="classroom-header-copy">
-              <span class="classroom-kicker">
-                // SALA
-              </span>
-
+              <span class="classroom-kicker">// SALA</span>
               <h1>{{ dados.sala.name }}</h1>
-
-              <p>
-                {{
-                  dados.sala.description ||
-                  'Sem descrição cadastrada.'
-                }}
-              </p>
-
+              <p>{{ dados.sala.description || 'Sem descrição cadastrada.' }}</p>
               <div class="classroom-header-meta">
-                <span>
-                  Professor:
-                  <strong>
-                    {{ dados.sala.teacher.full_name }}
-                  </strong>
+                <span class="classroom-icon-label">
+                  <Users :size="16" aria-hidden="true" />
+                  Professor: <strong>{{ dados.sala.teacher.full_name }}</strong>
                 </span>
-
-                <span aria-hidden="true">
-                  ·
-                </span>
-
-                <span>
-                  <strong>
-                    {{ dados.sala.total_students }}
-                  </strong>
-                  {{
-                    dados.sala.total_students === 1
-                      ? 'aluno'
-                      : 'alunos'
-                  }}
+                <span class="classroom-icon-label">
+                  <UserPlus :size="16" aria-hidden="true" />
+                  <strong>{{ dados.sala.total_students }}</strong>
+                  {{ dados.sala.total_students === 1 ? 'aluno' : 'alunos' }}
                 </span>
               </div>
             </div>
-
-            <button
-              type="button"
-              class="classroom-primary-button"
-              @click="abrirNovaTarefa"
-            >
-              + Nova tarefa
-            </button>
+            <div v-if="!aluno" class="classroom-header-actions">
+              <button type="button" class="classroom-primary-button classroom-icon-label" @click="abrirNovaTarefa">
+                <ListCheck :size="18" aria-hidden="true" /> Nova tarefa
+              </button>
+              <button type="button" class="classroom-secondary-button classroom-icon-label" @click="abrirAdicionarAluno">
+                <UserPlus :size="18" aria-hidden="true" /> Matricular alunos
+              </button>
+              <ClassroomManagement :classroom="dados.sala" @updated="Object.assign(dados.sala, $event)" />
+            </div>
           </header>
 
           <nav
@@ -521,6 +609,7 @@ onMounted(carregarSala)
                   abaAtiva === 'alunos'
               }"
               @click="abaAtiva = 'alunos'"
+              v-if="!aluno"
             >
               Alunos
               <span>
@@ -537,7 +626,7 @@ onMounted(carregarSala)
           >
             <div class="classroom-metrics">
               <article class="classroom-metric">
-                <span>ALUNOS</span>
+                <span class="classroom-icon-label"><Users :size="19" aria-hidden="true" /> ALUNOS</span>
 
                 <strong>
                   {{ dados.sala.total_students }}
@@ -545,7 +634,7 @@ onMounted(carregarSala)
               </article>
 
               <article class="classroom-metric">
-                <span>ATIVIDADES</span>
+                <span class="classroom-icon-label"><ListCheck :size="19" aria-hidden="true" /> ATIVIDADES</span>
 
                 <strong>
                   {{ dados.atividades.length }}
@@ -553,7 +642,7 @@ onMounted(carregarSala)
               </article>
 
               <article class="classroom-metric">
-                <span>PRÓXIMO PRAZO</span>
+                <span class="classroom-icon-label"><FileEdit :size="19" aria-hidden="true" /> PRÓXIMO PRAZO</span>
 
                 <strong
                   class="classroom-metric-date"
@@ -576,7 +665,7 @@ onMounted(carregarSala)
                     // PRÓXIMAS ATIVIDADES
                   </span>
 
-                  <h2>Prazos da turma</h2>
+                  <h2 class="classroom-icon-label"><FileEdit :size="21" aria-hidden="true" /> Próximas atividades</h2>
                 </div>
 
                 <button
@@ -619,7 +708,9 @@ onMounted(carregarSala)
                   </div>
 
                   <div class="classroom-deadline-copy">
-                    <h3>
+                    <h3 class="classroom-icon-label">
+                      <FileEdit v-if="atividade.type === 'questionnaire'" :size="17" aria-hidden="true" />
+                      <ListCheck v-else :size="17" aria-hidden="true" />
                       {{ atividade.title }}
                     </h3>
 
@@ -674,42 +765,89 @@ onMounted(carregarSala)
                 type="button"
                 class="classroom-primary-button"
                 @click="abrirNovaTarefa"
+                v-if="!aluno"
               >
                 + Nova tarefa
               </button>
             </div>
 
+            <div v-if="!aluno" class="classroom-activity-toolbar" aria-label="Filtrar atividades">
+              <label class="classroom-activity-search">
+                <span>Buscar atividade</span>
+                <span class="classroom-activity-search-field">
+                  <Search :size="17" aria-hidden="true" />
+                  <input v-model="buscaAtividade" type="search" placeholder="Título ou descrição" autocomplete="off" />
+                </span>
+              </label>
+              <label>
+                <span>Tipo</span>
+                <select v-model="filtroTipoAtividade">
+                  <option value="todos">Todos os tipos</option>
+                  <option value="questionnaire">Questionários</option>
+                  <option value="code">Código</option>
+                </select>
+              </label>
+              <label>
+                <span>Prazo</span>
+                <select v-model="filtroPrazoAtividade">
+                  <option value="todos">Todas as situações</option>
+                  <option value="andamento">Em andamento</option>
+                  <option value="encerrada">Encerrada</option>
+                  <option value="sem-prazo">Sem prazo</option>
+                </select>
+              </label>
+              <label>
+                <span>Ordenar por</span>
+                <select v-model="ordemAtividade">
+                  <option value="prazo">Prazo mais próximo</option>
+                  <option value="recentes">Mais recentes</option>
+                  <option value="antigas">Mais antigas</option>
+                  <option value="az">Nome (A–Z)</option>
+                  <option value="za">Nome (Z–A)</option>
+                </select>
+              </label>
+            </div>
+            <p v-if="!aluno && dados.atividades.length" class="classroom-activity-count" aria-live="polite">
+              {{ atividadesVisiveis.length }} de {{ dados.atividades.length }} atividades
+            </p>
+
             <div
-              v-if="atividadesOrdenadas.length"
+              v-if="atividadesVisiveis.length"
               class="classroom-activity-list"
             >
-              <button
-                v-for="
-                  atividade in atividadesOrdenadas
-                "
+              <article
+                v-for="atividade in atividadesVisiveis"
                 :key="atividade.id"
-                type="button"
-                class="classroom-activity classroom-activity--button"
-                @click="abrirAtividade(atividade.id)"
+                class="classroom-activity classroom-activity--button classroom-activity--with-menu"
               >
+                <AssignmentQuickActions
+                  v-if="!aluno"
+                  :assignment="atividade"
+                  @updated="atualizarAtividade"
+                  @deleted="excluirAtividade(atividade.id)"
+                  @view="abrirAtividade(atividade.id)"
+                />
+                <div class="classroom-activity-open" role="button" tabindex="0"
+                  :aria-label="`Abrir atividade ${atividade.title}`"
+                  @click="abrirAtividade(atividade.id)"
+                  @keydown.enter.prevent="abrirAtividade(atividade.id)"
+                  @keydown.space.prevent="abrirAtividade(atividade.id)">
                 <div class="classroom-activity-main">
-                  <div
-                    class="classroom-activity-labels"
-                  >
-                    <span>
-                      {{
-                        formatarTipo(
-                          atividade.type
-                        )
-                      }}
+                  <div class="classroom-activity-labels">
+                    <span class="classroom-activity-type">
+                      <Book v-if="atividade.type === 'questionnaire'" :size="14" aria-hidden="true" />
+                      <FileEdit v-else :size="14" aria-hidden="true" />
+                      {{ formatarTipo(atividade.type) }}
                     </span>
 
                     <span
                       :class="{
                         'classroom-activity-status--closed':
-                          statusAtividade(
-                            atividade
-                          ).encerrada
+                          !aluno && statusAtividade(atividade).encerrada,
+                        'classroom-activity-status--ongoing':
+                          !aluno && statusAtividade(atividade).label === 'EM ANDAMENTO',
+                        'classroom-activity-status--late': aluno && statusAtividade(atividade).encerrada,
+                        'classroom-activity-status--submitted': aluno && statusAtividade(atividade).entregue
                       }"
                     >
                       {{
@@ -734,8 +872,7 @@ onMounted(carregarSala)
 
                 <div class="classroom-activity-meta">
                   <span>
-                    PRAZO
-
+                    <span class="classroom-activity-meta-label"><Calendar :size="14" aria-hidden="true" /> PRAZO</span>
                     <strong>
                       {{
                         formatarData(
@@ -747,8 +884,7 @@ onMounted(carregarSala)
                   </span>
 
                   <span>
-                    RESULTADO
-
+                    <span class="classroom-activity-meta-label"><ListCheck :size="14" aria-hidden="true" /> RESULTADO</span>
                     <strong>
                       {{
                         formatarLiberacao(
@@ -758,25 +894,26 @@ onMounted(carregarSala)
                     </strong>
                   </span>
                 </div>
-              </button>
+                </div>
+              </article>
             </div>
 
             <div
               v-else
               class="classroom-empty"
             >
-              <span>
-                // SEM ATIVIDADES
-              </span>
-
-              <h3>
-                Esta sala ainda não possui tarefas.
-              </h3>
+              <span>{{ dados.atividades.length ? '// NENHUMA ATIVIDADE ENCONTRADA' : '// SEM ATIVIDADES' }}</span>
+              <h3>{{ dados.atividades.length ? 'Nenhuma atividade corresponde aos filtros.' : 'Esta sala ainda não possui tarefas.' }}</h3>
+              <button v-if="dados.atividades.length && !aluno" type="button" class="classroom-link-button"
+                @click="buscaAtividade = ''; filtroTipoAtividade = 'todos'; filtroPrazoAtividade = 'todos'; ordemAtividade = 'prazo'">
+                Limpar filtros
+              </button>
 
               <button
                 type="button"
                 class="classroom-primary-button"
                 @click="abrirNovaTarefa"
+                v-if="!aluno && !dados.atividades.length"
               >
                 Criar primeira tarefa
               </button>
@@ -786,7 +923,7 @@ onMounted(carregarSala)
           <!-- ALUNOS -->
 
           <section
-            v-else-if="abaAtiva === 'alunos'"
+            v-else-if="abaAtiva === 'alunos' && !aluno"
             class="classroom-section"
           >
             <div class="classroom-section-heading">
@@ -814,7 +951,7 @@ onMounted(carregarSala)
                 class="classroom-primary-button"
                 @click="abrirAdicionarAluno"
               >
-                + Adicionar aluno
+                <UserPlus :size="18" aria-hidden="true" /> Matricular aluno
               </button>
             </div>
 
@@ -849,17 +986,16 @@ onMounted(carregarSala)
             </article>
 
             <div class="classroom-student-toolbar">
-              <label for="student-search">
-                Buscar aluno
-              </label>
-
-              <input
-                id="student-search"
-                v-model="buscaAluno"
-                type="search"
-                placeholder="Nome ou e-mail"
-                autocomplete="off"
-              />
+              <label for="student-search">Pesquisar matriculados</label>
+              <div class="classroom-student-search-field">
+                <Search :size="18" aria-hidden="true" />
+                <input id="student-search" v-model="buscaAluno" type="search"
+                  placeholder="Buscar por nome ou e-mail" autocomplete="off" />
+              </div>
+              <p class="classroom-student-count" aria-live="polite">
+                <Users :size="15" aria-hidden="true" />
+                {{ alunosFiltrados.length }} de {{ dados.membros.students.length }} matriculados
+              </p>
             </div>
 
             <div
@@ -875,14 +1011,7 @@ onMounted(carregarSala)
                   class="classroom-avatar"
                   aria-hidden="true"
                 >
-                  {{
-                    aluno.full_name
-                      .split(' ')
-                      .slice(0, 2)
-                      .map((nome) => nome[0])
-                      .join('')
-                      .toUpperCase()
-                  }}
+                  {{ iniciaisPessoa(aluno.full_name) }}
                 </div>
 
                 <div class="classroom-student-copy">
@@ -906,6 +1035,7 @@ onMounted(carregarSala)
                     }}
                   </strong>
                 </div>
+                <StudentQuickActions :classroom-id="classroomId" :student="aluno" @removed="removerAlunoDaLista" />
               </article>
             </div>
 
@@ -943,11 +1073,13 @@ onMounted(carregarSala)
       </main>
 
       <ActivityDialog
+        v-if="!aluno"
         v-model:visible="activityDialogVisible"
         @continue="continuarNovaTarefa"
       />
 
       <AddStudentDialog
+        v-if="!aluno"
         v-model:visible="addStudentDialogVisible"
         v-model:search="buscaCandidato"
         :students="candidatosAluno"
@@ -956,8 +1088,8 @@ onMounted(carregarSala)
         :error="erroCandidatos"
         @add="adicionarAluno"
       />
-    </SidebarMain>
-  </SidebarLayout>
+    </component>
+  </component>
 </template>
 
 <style src="./estilos.css"></style>

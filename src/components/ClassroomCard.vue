@@ -1,5 +1,4 @@
 <script setup>
-import UsersIcon from '@primeicons/vue/users'
 
 defineProps({
   sala: {
@@ -30,21 +29,6 @@ defineProps({
       <p class="classroom-card-description">
         {{ sala.descricao }}
       </p>
-
-      <div class="classroom-card-meta">
-        <span class="classroom-card-meta-item">
-          <UsersIcon :size="15" />
-          <strong>{{ sala.alunos }}</strong>
-          <small>ALUNOS</small>
-        </span>
-
-        <span class="classroom-card-divider" aria-hidden="true"></span>
-
-        <span class="classroom-card-meta-item classroom-card-meta-item--attention">
-          <strong>{{ String(sala.atividadesPendentes).padStart(2, '0') }}</strong>
-          <small>PENDENTES</small>
-        </span>
-      </div>
     </div>
   </a>
 </template>

@@ -1,6 +1,7 @@
 <script setup>
 // v3: Salas abre /salas.html; /sala.html apenas mantém o item ativo
-import { ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+import { routerKey, routeLocationKey } from 'vue-router'
 
 import logoCodeClass from '../assets/images/logo.png'
 import Sidebar from 'primevue/sidebar'
@@ -17,6 +18,7 @@ import SidebarMenu from 'primevue/sidebarmenu'
 import SidebarMenuItem from 'primevue/sidebarmenuitem'
 import SidebarMenuButton from 'primevue/sidebarmenubutton'
 import { supabase } from '../config/supabase'
+import { obterPerfilDaPagina } from '../config/auth'
 
 import {
   Home,
@@ -43,6 +45,9 @@ import './sidebarProfessor.css'
    ESTADO DA SIDEBAR
    ================================================== */
 
+const router = inject(routerKey, null)
+const route = inject(routeLocationKey, null)
+const spaAtiva = computed(() => route?.path?.startsWith('/professor/') ?? false)
 const sidebarAberta = ref(true)
 
 
@@ -78,7 +83,7 @@ const itensMenu = [
   {
     label: 'Correções',
     icon: FileEdit,
-    url: null
+    url: '/correcoes.html'
   },
   {
     label: 'Chat',
@@ -86,6 +91,9 @@ const itensMenu = [
     url: null
   }
 ]
+if (['owner', 'admin'].includes(obterPerfilDaPagina()?.role)) {
+  itensMenu.splice(4, 0, { label: 'Alunos', icon: User, url: '/alunos.html' })
+}
 
 /* ==================================================
    IDENTIFICA A PÁGINA ATUAL
@@ -96,7 +104,9 @@ function itemAtivo(item) {
     return false
   }
 
-  const pathname = window.location.pathname
+  const pathname = spaAtiva.value ? ({ '/professor/dashboard': '/dashboardProfessor.html', '/professor/salas': '/salas.html', '/professor/tarefas': '/tarefas.html', '/professor/correcoes': '/correcoes.html' }[route.path] || route.path) : window.location.pathname
+  if (item.url === '/correcoes.html' && pathname === '/corrigirEntrega.html') return true
+  if (item.url === '/tarefas.html' && ['/atividade.html', '/criarTarefa.html'].includes(pathname)) return true
 
   if (item.url === '/salas.html' && pathname === '/sala.html') {
     return true
@@ -115,6 +125,10 @@ function navegar(item) {
     return
   }
 
+  if (spaAtiva.value && item.url === '/dashboardProfessor.html') { router.push('/professor/dashboard'); return }
+  if (spaAtiva.value && item.url === '/salas.html') { router.push('/professor/salas'); return }
+  if (spaAtiva.value && item.url === '/tarefas.html') { router.push('/professor/tarefas'); return }
+  if (spaAtiva.value && item.url === '/correcoes.html') { router.push('/professor/correcoes'); return }
   window.location.href = item.url
 }
 
@@ -188,6 +202,7 @@ async function sair() {
                   :key="item.label"
                 >
                   <SidebarMenuButton
+                    :disabled="!item.url"
                     :isActive="itemAtivo(item)"
                     :class="[
                       'cc-sidebar-button',

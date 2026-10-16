@@ -1,4 +1,10 @@
 <script setup>
+import { inject } from 'vue'
+import { routeLocationKey, onBeforeRouteLeave } from 'vue-router'
+import { useProfessorNavigation } from '../../router/professorNavigation'
+const props = defineProps({ embedded: { type: Boolean, default: false } })
+const route = inject(routeLocationKey, null)
+const navegar = useProfessorNavigation()
 import {
   computed,
   onMounted,
@@ -34,7 +40,7 @@ function carregarDadosIniciais() {
 const dadosIniciais = carregarDadosIniciais()
 
 if (!dadosIniciais) {
-  window.location.href = '/dashboardProfessor.html'
+  onMounted(() => navegar('/dashboardProfessor.html'))
 }
 
 const salas = ref([])
@@ -327,10 +333,9 @@ async function salvarTarefa() {
 
     alert('Tarefa criada com sucesso!')
 
-    window.location.href =
-      `/sala.html?id=${encodeURIComponent(
+    navegar(`/sala.html?id=${encodeURIComponent(
         salaSelecionada.value
-      )}&tab=atividades`
+      )}&tab=atividades`)
   } catch (error) {
     console.error(error)
 
@@ -344,10 +349,10 @@ async function salvarTarefa() {
 </script>
 
 <template>
-  <SidebarLayout class="criar-tarefa-layout">
-    <SidebarProfessor />
+  <component :is="embedded ? 'div' : SidebarLayout" class="criar-tarefa-layout">
+    <SidebarProfessor v-if="!embedded" />
 
-    <SidebarMain>
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="criar-tarefa-page">
         <header class="criar-tarefa-header">
           <span>
@@ -504,8 +509,8 @@ async function salvarTarefa() {
           </button>
         </div>
       </main>
-    </SidebarMain>
-  </SidebarLayout>
+    </component>
+  </component>
 </template>
 
 <style src="./estilos.css"></style>

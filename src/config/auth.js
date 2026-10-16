@@ -1,6 +1,8 @@
 import { supabase } from './supabase'
 
 const apiUrl = import.meta.env.VITE_API_URL
+let perfilDaPagina = null
+export function obterPerfilDaPagina() { return perfilDaPagina }
 
 export async function obterUsuarioAtual() {
   const {
@@ -24,6 +26,7 @@ export async function obterUsuarioAtual() {
   }
 
   const perfil = await response.json()
+  perfilDaPagina = perfil
 
   return {
     session,

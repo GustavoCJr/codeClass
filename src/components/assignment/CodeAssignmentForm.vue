@@ -9,6 +9,7 @@ import Textarea from 'primevue/textarea'
 const emit = defineEmits([
   'update:modelValue'
 ])
+const props = defineProps({ initialConfig: { type: Object, default: null } })
 
 const linguagensDisponiveis = [
   { label: 'Python 3', value: 'python3' },
@@ -57,6 +58,13 @@ const rubrica = ref('')
 const casosTeste = ref([
   criarCasoTeste()
 ])
+if (props.initialConfig) {
+  linguagens.value = props.initialConfig.languages.map(item => ({ ...item, uid: gerarUid() }))
+  limiteTempo.value = props.initialConfig.time_limit_sec
+  limiteMemoria.value = props.initialConfig.memory_limit_mb
+  rubrica.value = props.initialConfig.rubric || ''
+  casosTeste.value = props.initialConfig.test_cases.map(item => ({ ...item, uid: gerarUid() }))
+}
 
 const podeAdicionarLinguagem = computed(() => {
   return linguagens.value.length < linguagensDisponiveis.length

@@ -180,7 +180,7 @@
 
 .dashboard-metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 28px;
 
   border: 1px solid var(--color-border);
@@ -802,9 +802,6 @@
     border-right: 0;
   }
 
-  .dashboard-metric:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--color-border);
-  }
 
   .dashboard-work-grid {
     grid-template-columns: 1fr;
@@ -1052,3 +1049,6 @@
     animation: none;
   }
 }
+
+/* Dashboard enxuto: painel único de correções */
+.dashboard-work-grid { grid-template-columns: minmax(0, 1fr); }

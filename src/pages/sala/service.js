@@ -8,6 +8,10 @@ export function definirContextoSala(perfil) {
   perfilAtual = perfil
 }
 
+export function alunoNaPaginaSala() {
+  return perfilAtual?.role === 'student'
+}
+
 async function obterSessao() {
   const {
     data: { session },
@@ -93,38 +97,45 @@ async function chamarApi(
 
 export async function buscarPaginaSala(classroomId) {
   const session = await obterSessao()
+  const aluno = alunoNaPaginaSala()
+  const id = encodeURIComponent(classroomId)
 
   const [
     sala,
     atividades,
-    membros
+    participantesOuSubmissoes
   ] = await Promise.all([
     chamarApi(
-      `/api/v1/classrooms/${classroomId}`,
+      `/api/v1/classrooms/${id}`,
       {},
       session,
       'Não foi possível carregar os dados da sala.'
     ),
 
     chamarApi(
-      `/api/v1/classrooms/${classroomId}/assignments`,
+      `/api/v1/classrooms/${id}/assignments`,
       {},
       session,
       'Não foi possível carregar as atividades da sala.'
     ),
 
     chamarApi(
-      `/api/v1/classrooms/${classroomId}/members`,
+      aluno
+        ? `/api/v1/submissions?classroom_id=${id}`
+        : `/api/v1/classrooms/${id}/members`,
       {},
       session,
-      'Não foi possível carregar os participantes da sala.'
+      aluno
+        ? 'Não foi possível carregar suas entregas.'
+        : 'Não foi possível carregar os participantes da sala.'
     )
   ])
 
   return {
     sala,
     atividades,
-    membros
+    membros: aluno ? null : participantesOuSubmissoes,
+    submissoes: aluno ? participantesOuSubmissoes : []
   }
 }
 

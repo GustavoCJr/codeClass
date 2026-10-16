@@ -1,7 +1,4 @@
 <script setup>
-// CODECLASS - SIDEBAR ALUNO
-// v1: estrutura inicial do aluno, compartilhando o CSS validado da sidebar do professor
-
 import { ref } from 'vue'
 
 import logoCodeClass from '../assets/images/logo.png'
@@ -39,59 +36,45 @@ import {
   alternarTema as alternarTemaGlobal
 } from '../config/theme'
 
-/*
- * Reutiliza o mesmo CSS estrutural da sidebar do professor.
- * Isso preserva a solução validada com o painel visual fixo na viewport.
- */
+import { supabase } from '../config/supabase'
+
 import './sidebarProfessor.css'
 
-/* ==================================================
-   ESTADO DA SIDEBAR
-   ================================================== */
-
 const sidebarAberta = ref(true)
-
-/* ==================================================
-   ESTADO DO TEMA
-   ================================================== */
-
 const temaAtual = ref(obterTemaSalvo())
+const saindo = ref(false)
 
 function trocarTema() {
-  temaAtual.value = alternarTemaGlobal()
+  temaAtual.value =
+    alternarTemaGlobal()
 }
-
-/* ==================================================
-   NAVEGAÇÃO PRINCIPAL
-
-   As páginas específicas do aluno ainda serão criadas.
-   Por enquanto, apenas a Sala compartilhada possui rota ativa.
-   ================================================== */
 
 const itensMenu = [
   {
     label: 'Início',
     icon: Home,
-    url: null,
-    activePaths: []
+    url: '/dashboardAluno.html',
+    activePaths: [
+      '/dashboardAluno.html'
+    ]
   },
   {
     label: 'Salas',
     icon: Book,
-    url: null,
-    activePaths: ['/sala.html']
+    url: '/salas.html',
+    activePaths: ['/salas.html', '/sala.html', '/atividade.html']
   },
   {
     label: 'Tarefas',
     icon: ListCheck,
-    url: null,
-    activePaths: []
+    url: '/tarefasAluno.html',
+    activePaths: ['/tarefasAluno.html']
   },
   {
     label: 'Resultados',
     icon: FileEdit,
-    url: null,
-    activePaths: []
+    url: '/resultadosAluno.html',
+    activePaths: ['/resultadosAluno.html']
   },
   {
     label: 'Chat',
@@ -101,23 +84,23 @@ const itensMenu = [
   }
 ]
 
-/* ==================================================
-   IDENTIFICA A PÁGINA ATUAL
-   ================================================== */
-
 function itemAtivo(item) {
-  const pathname = window.location.pathname
+  const pathname =
+    window.location.pathname
 
-  if (item.activePaths?.includes(pathname)) {
+  if (
+    item.activePaths?.includes(
+      pathname
+    )
+  ) {
     return true
   }
 
-  return Boolean(item.url && pathname === item.url)
+  return Boolean(
+    item.url &&
+    pathname === item.url
+  )
 }
-
-/* ==================================================
-   NAVEGAÇÃO
-   ================================================== */
 
 function navegar(item) {
   if (!item.url) {
@@ -127,22 +110,22 @@ function navegar(item) {
   window.location.href = item.url
 }
 
-/* ==================================================
-   AÇÕES DO FOOTER
-   ================================================== */
-
 function abrirPerfil() {
-  /*
-   * Futuramente:
-   * window.location.href = '/perfil.html'
-   */
+  // Perfil entra depois do fluxo principal do aluno.
 }
 
-function sair() {
-  /*
-   * Futuramente:
-   * logout real via Supabase Auth.
-   */
+async function sair() {
+  if (saindo.value) {
+    return
+  }
+
+  saindo.value = true
+
+  try {
+    await supabase.auth.signOut()
+  } finally {
+    window.location.href = '/login.html'
+  }
 }
 </script>
 
@@ -194,15 +177,23 @@ function sair() {
                   :key="item.label"
                 >
                   <SidebarMenuButton
+                    :disabled="!item.url"
                     :isActive="itemAtivo(item)"
                     :class="[
                       'cc-sidebar-button',
                       {
-                        'cc-sidebar-button-active': itemAtivo(item),
-                        'cc-sidebar-button-disabled': !item.url && !itemAtivo(item)
+                        'cc-sidebar-button-active':
+                          itemAtivo(item),
+                        'cc-sidebar-button-disabled':
+                          !item.url &&
+                          !itemAtivo(item)
                       }
                     ]"
-                    :title="sidebarAberta ? null : item.label"
+                    :title="
+                      sidebarAberta
+                        ? null
+                        : item.label
+                    "
                     :aria-label="item.label"
                     @click="navegar(item)"
                   >
@@ -228,9 +219,20 @@ function sair() {
             <button
               class="cc-sidebar-footer-button cc-sidebar-collapse-button"
               type="button"
-              :title="sidebarAberta ? 'Recolher sidebar' : 'Expandir sidebar'"
-              :aria-label="sidebarAberta ? 'Recolher sidebar' : 'Expandir sidebar'"
-              @click="sidebarAberta = !sidebarAberta"
+              :title="
+                sidebarAberta
+                  ? 'Recolher sidebar'
+                  : 'Expandir sidebar'
+              "
+              :aria-label="
+                sidebarAberta
+                  ? 'Recolher sidebar'
+                  : 'Expandir sidebar'
+              "
+              @click="
+                sidebarAberta =
+                  !sidebarAberta
+              "
             >
               <span class="cc-sidebar-icon">
                 <ChevronLeft
@@ -268,7 +270,9 @@ function sair() {
             >
               <span class="cc-sidebar-icon">
                 <Moon
-                  v-if="temaAtual === 'light'"
+                  v-if="
+                    temaAtual === 'light'
+                  "
                   size="19"
                 />
 
@@ -290,7 +294,11 @@ function sair() {
             <button
               class="cc-sidebar-footer-button"
               type="button"
-              :title="sidebarAberta ? null : 'Perfil'"
+              :title="
+                sidebarAberta
+                  ? null
+                  : 'Perfil'
+              "
               aria-label="Abrir perfil"
               @click="abrirPerfil"
             >
@@ -306,7 +314,12 @@ function sair() {
             <button
               class="cc-sidebar-footer-button cc-sidebar-logout"
               type="button"
-              :title="sidebarAberta ? null : 'Sair'"
+              :disabled="saindo"
+              :title="
+                sidebarAberta
+                  ? null
+                  : 'Sair'
+              "
               aria-label="Sair"
               @click="sair"
             >
@@ -315,7 +328,11 @@ function sair() {
               </span>
 
               <span class="cc-sidebar-text">
-                Sair
+                {{
+                  saindo
+                    ? 'Saindo...'
+                    : 'Sair'
+                }}
               </span>
             </button>
           </div>

@@ -1,7 +1,14 @@
 <script setup>
+import { inject } from 'vue'
+import { routeLocationKey, onBeforeRouteLeave } from 'vue-router'
+import { useProfessorNavigation } from '../../router/professorNavigation'
+const props = defineProps({ embedded: { type: Boolean, default: false } })
+const route = inject(routeLocationKey, null)
+const navegar = useProfessorNavigation()
 import {
   computed,
   onMounted,
+  onUnmounted,
   reactive,
   ref
 } from 'vue'
@@ -10,6 +17,7 @@ import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 
 import SidebarProfessor from '../../components/sidebarProfessor.vue'
+import { api } from '../../config/api'
 
 import {
   buscarPaginaCorrecao,
@@ -22,15 +30,41 @@ const erro = ref('')
 const salvando = ref(false)
 const mensagem = ref('')
 const erroSalvar = ref('')
+const atualizandoIA = ref(false)
+async function atualizarIA(retry = false) {
+  if (atualizandoIA.value || salvando.value) return
+  atualizandoIA.value = true
+  erroSalvar.value = ''
+  try {
+    const resultado = await api(`/submissions/${encodeURIComponent(submissionId)}${retry ? '/retry-ai' : ''}`, retry ? { method: 'POST' } : {})
+    dados.value.submissao.ai_insight = resultado.ai_insight
+    dados.value.submissao.status = resultado.status
+    mensagem.value = retry ? 'Nova análise solicitada. Use Atualizar análise para acompanhar.' : 'Análise atualizada.'
+  } catch (error) { erroSalvar.value = error.message }
+  finally { atualizandoIA.value = false }
+}
 
 const feedbackGeral = ref('')
 const notaCodigo = ref(null)
 
 const correcoesQuestoes = reactive({})
+const formularioSalvo = ref('')
+const proximaEntrega = ref(null)
+function snapshotFormulario() { return JSON.stringify({ feedbackGeral: feedbackGeral.value, notaCodigo: notaCodigo.value, correcoesQuestoes }) }
+function protegerSaida(event) {
+  if (!dados.value || snapshotFormulario() === formularioSalvo.value) return
+  event.preventDefault(); event.returnValue = ''
+}
+async function carregarProximaEntrega() {
+  try {
+    const entregas = await api(`/submissions?status=awaiting_review&classroom_id=${encodeURIComponent(atividade.value.classroom_id)}`)
+    proximaEntrega.value = entregas.filter(item => item.id !== submissionId).sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at))[0] || null
+  } catch { proximaEntrega.value = null }
+}
 
 function obterSubmissionId() {
   return new URLSearchParams(
-    window.location.search
+    (route?.query ? new URLSearchParams(route.query).toString() : window.location.search)
   ).get('id')
 }
 
@@ -345,12 +379,11 @@ function voltarParaAtividade() {
     submissao.value?.assignment?.id
 
   if (!assignmentId) {
-    window.location.href = '/salas.html'
+    navegar('/salas.html')
     return
   }
 
-  window.location.href =
-    `/atividade.html?id=${encodeURIComponent(assignmentId)}`
+  navegar(`/atividade.html?id=${encodeURIComponent(assignmentId)}`)
 }
 
 function validarFormulario() {
@@ -465,6 +498,7 @@ function montarPayload(publicar) {
 }
 
 async function avaliar(publicar) {
+  if (salvando.value || atualizandoIA.value) return
   if (!validarFormulario()) {
     return
   }
@@ -485,6 +519,7 @@ async function avaliar(publicar) {
 
     dados.value.submissao.evaluation =
       avaliacao
+    formularioSalvo.value = snapshotFormulario()
 
     if (publicar) {
       dados.value.submissao.status =
@@ -535,6 +570,8 @@ async function carregarPagina() {
       )
 
     inicializarFormulario()
+    formularioSalvo.value = snapshotFormulario()
+    carregarProximaEntrega()
   } catch (error) {
     console.error(error)
 
@@ -547,14 +584,19 @@ async function carregarPagina() {
   }
 }
 
-onMounted(carregarPagina)
+if (props.embedded) onBeforeRouteLeave(() => {
+  if (!dados.value || snapshotFormulario() === formularioSalvo.value) return true
+  return window.confirm('Há alterações não salvas. Deseja sair sem salvar?')
+})
+onMounted(() => { carregarPagina(); window.addEventListener('beforeunload', protegerSaida) })
+onUnmounted(() => window.removeEventListener('beforeunload', protegerSaida))
 </script>
 
 <template>
-  <SidebarLayout>
-    <SidebarProfessor />
+  <component :is="embedded ? 'div' : SidebarLayout">
+    <SidebarProfessor v-if="!embedded" />
 
-    <SidebarMain>
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="review-page">
         <div
           v-if="carregando"
@@ -625,6 +667,12 @@ onMounted(carregarPagina)
               </strong>
             </div>
           </header>
+          <div class="cc-management-actions">
+            <a href="/correcoes.html">Voltar para central de correções</a>
+            <a v-if="proximaEntrega" :href="`/corrigirEntrega.html?id=${encodeURIComponent(proximaEntrega.id)}`">Próxima entrega: {{ proximaEntrega.student.full_name }}</a>
+            <button type="button" :disabled="atualizandoIA || salvando" @click="atualizarIA(false)">Atualizar análise</button>
+            <button v-if="submissao.ai_insight?.status === 'failed'" type="button" :disabled="atualizandoIA || salvando" @click="atualizarIA(true)">Tentar análise novamente</button>
+          </div>
 
           <section class="review-student-card">
             <div>
@@ -1152,8 +1200,8 @@ onMounted(carregarPagina)
           </footer>
         </template>
       </main>
-    </SidebarMain>
-  </SidebarLayout>
+    </component>
+  </component>
 </template>
 
 <style src="./estilos.css"></style>
