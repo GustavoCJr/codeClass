@@ -4,6 +4,7 @@ import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 import Dialog from 'primevue/dialog'
 import SidebarAluno from '../../components/sidebarAluno.vue'
+import CodeEditor from '../../components/editor/CodeEditor.vue'
 import { buscarAtividadeAluno, salvarRespostasAluno, testarCodigoAluno } from './service'
 import { montarRespostas, recuperarRespostas } from './respostasAluno'
 import { iniciarCodigos, validarCodigo, formatarVeredito } from './codigoAluno'
@@ -237,7 +238,7 @@ onUnmounted(() => {
             </div>
             <p v-if="!linguagens.length" role="alert" class="student-assignment-error">Esta atividade não possui linguagens disponíveis.</p>
             <label class="student-code-label" for="student-code">Código-fonte</label>
-            <textarea id="student-code" v-model="codigo" class="student-open-answer student-code-editor" rows="18" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" :readonly="bloqueado" :disabled="!linguagem" aria-describedby="student-code-help"></textarea>
+            <CodeEditor id="student-code" v-model="codigo" :language="linguagem" :read-only="bloqueado" :disabled="!linguagem" aria-describedby="student-code-help" />
             <p id="student-code-help" class="student-answer-progress">Salvar rascunho e entregar usam o código da linguagem selecionada. Executar testes não salva nem entrega a atividade.</p>
 
             <div class="student-assignment-actions">

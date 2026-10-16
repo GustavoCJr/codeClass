@@ -17,7 +17,8 @@
     "@supabase/supabase-js": "^2.117.2",
     "primevue": "^5.0.2",
     "vue": "^3.5.42",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "monaco-editor": "^0.52.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.8",
