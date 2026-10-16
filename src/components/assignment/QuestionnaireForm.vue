@@ -11,6 +11,7 @@ import Textarea from 'primevue/textarea'
 const emit = defineEmits([
   'update:modelValue'
 ])
+const props = defineProps({ initialConfig: { type: Object, default: null } })
 
 const tiposQuestao = [
   {
@@ -63,6 +64,11 @@ function criarQuestao(tipo = 'choice') {
 const questoes = ref([
   criarQuestao()
 ])
+if (props.initialConfig?.questions) {
+  questoes.value = JSON.parse(JSON.stringify(props.initialConfig.questions)).map(questao => ({
+    ...criarQuestao(questao.type), ...questao
+  }))
+}
 
 const totalPontos = computed(() => {
   return questoes.value.reduce(

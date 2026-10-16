@@ -1,4 +1,5 @@
 import Atividade from './atividade.vue'
+import AtividadeAluno from './atividadeAluno.vue'
 
 import { createPageApp } from '../../config/createPageApp'
 import { obterUsuarioAtual } from '../../config/auth'
@@ -12,6 +13,11 @@ async function iniciarPagina() {
   }
 
   const role = usuarioAtual.perfil?.role
+
+  if (role === 'student') {
+    createPageApp(AtividadeAluno)
+    return
+  }
 
   if (
     role !== 'owner' &&

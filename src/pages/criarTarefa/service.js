@@ -1,9 +1,14 @@
-import { obterUsuarioAtual } from '../../config/auth'
+import { supabase } from '../../config/supabase'
+
+async function obterSessaoAtual() {
+  const { data: { session }, error } = await supabase.auth.getSession()
+  return error || !session ? null : { session }
+}
 
 const apiUrl = import.meta.env.VITE_API_URL
 
 export async function buscarSalasParaTarefa() {
-  const usuarioAtual = await obterUsuarioAtual()
+  const usuarioAtual = await obterSessaoAtual()
 
   if (!usuarioAtual) {
     throw new Error('Usuário não autenticado.')
@@ -32,7 +37,7 @@ export async function criarTarefa(
   classroomId,
   payload
 ) {
-  const usuarioAtual = await obterUsuarioAtual()
+  const usuarioAtual = await obterSessaoAtual()
 
   if (!usuarioAtual) {
     throw new Error('Usuário não autenticado.')

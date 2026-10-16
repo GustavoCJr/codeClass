@@ -1,0 +1,47 @@
+.student-statement { white-space: pre-wrap; }
+.student-question-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.student-form-legend { font-weight: 600; margin-bottom: 1rem; }
+.student-question-title { font-size: 1.1rem; }
+.student-choice { cursor: pointer; }
+.student-choice input { accent-color: var(--color-primary); flex: 0 0 auto; }
+.student-choice--selected { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.student-open-answer { width: 100%; box-sizing: border-box; padding: 1rem; resize: vertical; border: 1px solid var(--color-border-strong); border-radius: 8px; background: var(--input-background); color: var(--color-text); font: inherit; line-height: 1.6; }
+.student-open-answer:focus-visible, .student-choice:focus-within { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.student-question-fieldset:disabled .student-choice { cursor: default; }
+.student-assignment-actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1.5rem; }
+.student-submit-button { padding: 0.75rem 1rem; border: 1px solid var(--color-primary); border-radius: 8px; background: var(--color-primary); color: var(--color-on-primary); font: inherit; font-weight: 600; cursor: pointer; }
+.student-submit-button:hover:not(:disabled) { background: var(--color-primary-hover); }
+.student-submit-button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.student-submit-button:disabled { opacity: 0.55; cursor: default; }
+.student-assignment-notice { background: var(--color-primary-soft); color: var(--color-text); border: 1px solid var(--color-primary-border-soft); border-radius: 8px; padding: 1rem; }
+.student-assignment-error { color: var(--color-danger); background: var(--color-danger-soft); border: 1px solid var(--color-danger-border); border-radius: 8px; padding: 1rem; }
+.student-answer-progress { color: var(--color-text-secondary); }
+.student-filters { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.student-filters label, .student-edit-form label { display: flex; flex-direction: column; gap: 0.5rem; }
+.student-filters input, .student-filters select, .student-edit-form input, .student-edit-form textarea, .student-edit-form select { padding: 0.75rem; color: var(--color-text); background: var(--input-background); border: 1px solid var(--input-border); border-radius: 8px; font: inherit; }
+.student-task-card { display: block; padding: 1.25rem; border: 1px solid var(--color-border); border-radius: 10px; color: var(--color-text); background: var(--color-surface); text-decoration: none; }
+.student-task-card:hover { background: var(--color-surface-hover); }
+.student-task-card:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.student-edit-form { display: flex; flex-direction: column; gap: 1rem; }
+.student-filters input:focus-visible, .student-filters select:focus-visible, .student-edit-form input:focus-visible, .student-edit-form select:focus-visible, .student-edit-form textarea:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.student-filters { align-items: end; }
+.student-filters label { min-width: 180px; flex: 1 1 200px; }
+.student-assignment-actions button:not(.student-submit-button):not(.assignment-secondary-button) { padding: 0.65rem 0.85rem; color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: 8px; font: inherit; cursor: pointer; }
+.student-assignment-actions button:disabled { opacity: 0.55; cursor: default; }
+.student-assignment-actions button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+@media (max-width: 650px) { .student-filters label { min-width: 0; flex-basis: 100%; } .student-task-card h2 { overflow-wrap: anywhere; } }
+@media (prefers-reduced-motion: reduce) { .student-assignment *, .student-task-card { transition: none !important; animation: none !important; } }
+.student-code-language { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin: 1.25rem 0; }
+.student-code-language select { padding: 0.65rem; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-background); color: var(--color-text); font: inherit; }
+.student-code-language select:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.student-code-label { display: block; margin-bottom: 0.65rem; font-weight: 600; }
+.student-code-editor { font-family: var(--font-mono); font-size: 0.9rem; tab-size: 4; white-space: pre; overflow: auto; }
+.student-code-editor[readonly] { background: var(--color-surface-secondary); }
+.student-test-results { margin-top: 2rem; }
+.student-test-case { padding: 1rem; margin-top: 1rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); }
+.student-test-case pre { margin: 0; padding: 0.75rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--color-surface-secondary); color: var(--color-text); border-radius: 6px; font-family: var(--font-mono); }
+.student-test-case h4 { margin-bottom: 0.5rem; }
+@media (max-width: 650px) {
+  .student-assignment-actions > button { width: 100%; }
+  .student-code-editor { font-size: 0.8rem; }
+}

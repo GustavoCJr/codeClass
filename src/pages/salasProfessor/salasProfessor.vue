@@ -1,4 +1,8 @@
 <script setup>
+import { useProfessorNavigation } from '../../router/professorNavigation'
+const navegar = useProfessorNavigation()
+const props = defineProps({ embedded: { type: Boolean, default: false } })
+
 import {
   computed,
   onMounted,
@@ -9,18 +13,29 @@ import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 
 import SidebarProfessor from '../../components/sidebarProfessor.vue'
+import SidebarAluno from '../../components/sidebarAluno.vue'
+import { Book, Calendar, ChevronRight, Search } from '@primeicons/vue'
 import ClassroomDialog from '../../components/ClassroomDialog.vue'
+import ClassroomQuickActions from '../../components/classroom/ClassroomQuickActions.vue'
 
 import {
   buscarSalas,
-  criarSala
+  criarSala,
+  alunoNaPaginaSalas
 } from './service'
 
+const aluno = alunoNaPaginaSalas()
 const salas = ref([])
 const busca = ref('')
+const ordenacao = ref('recentes')
 
 const carregando = ref(true)
 const erro = ref('')
+const aviso = ref('')
+function atualizarSala(sala) {
+  salas.value = salas.value.map(atual => atual.id === sala.id ? { ...atual, ...sala } : atual)
+}
+function excluirSala(id) { salas.value = salas.value.filter(sala => sala.id !== id) }
 
 const classroomDialogVisible = ref(false)
 const salvandoSala = ref(false)
@@ -34,23 +49,51 @@ function normalizarTexto(valor) {
     .trim()
 }
 
+function dataCriacao(sala) {
+  const data = Date.parse(sala?.created_at || '')
+  return Number.isFinite(data) ? data : null
+}
+
+function formatarDataCriacao(sala) {
+  const data = dataCriacao(sala)
+  if (data === null) return 'Data não informada'
+  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).format(data)
+}
+
+function iniciaisDaSala(nome) {
+  const palavras = String(nome || '').trim().split(/\s+/).filter(Boolean)
+  return (palavras.length > 1 ? palavras[0][0] + palavras[1][0] : (palavras[0] || 'S').slice(0, 2))
+    .toLocaleUpperCase('pt-BR')
+}
+
 const salasFiltradas = computed(() => {
   const termo = normalizarTexto(busca.value)
+  const filtradas = salas.value.filter((sala) =>
+    !termo || normalizarTexto(`${sala.name} ${sala.description || ''}`).includes(termo)
+  )
 
-  if (!termo) {
-    return salas.value
-  }
+  return [...filtradas].sort((a, b) => {
+    if (ordenacao.value === 'az' || ordenacao.value === 'za') {
+      const diferenca = String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR', {
+        sensitivity: 'base', numeric: true
+      })
+      return (ordenacao.value === 'az' ? diferenca : -diferenca) ||
+        String(a.id || '').localeCompare(String(b.id || ''))
+    }
 
-  return salas.value.filter((sala) => {
-    return normalizarTexto(
-      `${sala.name} ${sala.description || ''}`
-    ).includes(termo)
+    const dataA = dataCriacao(a)
+    const dataB = dataCriacao(b)
+    // Salas sem data válida ficam ao final em ambas as ordenações.
+    if (dataA === null && dataB !== null) return 1
+    if (dataB === null && dataA !== null) return -1
+    const diferenca = (dataA ?? 0) - (dataB ?? 0)
+    return (ordenacao.value === 'antigas' ? diferenca : -diferenca) ||
+      String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR')
   })
 })
 
 function abrirSala(sala) {
-  window.location.href =
-    `/sala.html?id=${encodeURIComponent(sala.id)}`
+  navegar(`/sala.html?id=${encodeURIComponent(sala.id)}`)
 }
 
 function abrirDialogCriacao() {
@@ -67,10 +110,9 @@ async function criarNovaSala(payload) {
 
     classroomDialogVisible.value = false
 
-    window.location.href =
-      `/sala.html?id=${encodeURIComponent(
+    navegar(`/sala.html?id=${encodeURIComponent(
         novaSala.id
-      )}`
+      )}`)
   } catch (error) {
     console.error(error)
 
@@ -105,26 +147,29 @@ onMounted(carregarSalas)
 </script>
 
 <template>
-  <SidebarLayout>
-    <SidebarProfessor />
+  <component :is="embedded ? 'div' : SidebarLayout">
+    <SidebarAluno v-if="aluno && !embedded" />
+    <SidebarProfessor v-else-if="!embedded" />
 
-    <SidebarMain>
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="salas-page">
         <header class="salas-header">
           <div class="salas-header-copy">
             <span>// SALAS</span>
 
-            <h1>Suas salas</h1>
+            <h1>{{ aluno ? 'Minhas salas' : 'Suas salas' }}</h1>
 
             <p>
-              Acesse as turmas das quais você participa
-              como professor.
+              {{ aluno
+                ? 'Acesse as turmas em que você está matriculado.'
+                : 'Acesse as turmas das quais você participa como professor.' }}
             </p>
           </div>
 
           <button
             type="button"
             class="salas-create-button"
+            v-if="!aluno"
             @click="abrirDialogCriacao"
           >
             <span aria-hidden="true">+</span>
@@ -154,18 +199,30 @@ onMounted(carregarSalas)
         </section>
 
         <template v-else>
+          <p v-if="aviso" class="salas-notice" role="status">{{ aviso }}</p>
           <div class="salas-toolbar">
-            <label for="salas-search">
-              Buscar sala
-            </label>
-
-            <input
-              id="salas-search"
-              v-model="busca"
-              type="search"
-              placeholder="Nome ou descrição"
-              autocomplete="off"
-            />
+            <div class="salas-control salas-search-control">
+              <label for="salas-search">Buscar sala</label>
+              <div class="salas-input-wrap">
+                <Search class="salas-control-icon" aria-hidden="true" />
+                <input
+                  id="salas-search"
+                  v-model="busca"
+                  type="search"
+                  placeholder="Nome ou descrição"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+            <div class="salas-control salas-order-control">
+              <label for="salas-ordenacao">Ordenar por</label>
+              <select id="salas-ordenacao" v-model="ordenacao">
+                <option value="recentes">Mais recentes</option>
+                <option value="antigas">Mais antigas</option>
+                <option value="az">Nome (A–Z)</option>
+                <option value="za">Nome (Z–A)</option>
+              </select>
+            </div>
           </div>
 
           <section>
@@ -181,37 +238,42 @@ onMounted(carregarSalas)
               v-if="salasFiltradas.length"
               class="salas-grid"
             >
-              <button
+              <article
                 v-for="sala in salasFiltradas"
                 :key="sala.id"
-                type="button"
                 class="sala-card"
-                @click="abrirSala(sala)"
               >
-                <div>
-                  <span class="sala-card-label">
-                    SALA
-                  </span>
-
-                  <h3>
-                    {{ sala.name }}
-                  </h3>
-
-                  <p>
-                    {{
-                      sala.description ||
-                      'Sem descrição cadastrada.'
-                    }}
-                  </p>
+                <button type="button" class="sala-card-main" :aria-label="`Abrir sala ${sala.name}`" @click="abrirSala(sala)">
+                <div class="sala-card-top">
+                  <span class="sala-card-monogram" aria-hidden="true">{{ iniciaisDaSala(sala.name) }}</span>
+                  <Book class="sala-card-top-icon" aria-hidden="true" />
                 </div>
 
-                <span
-                  class="sala-card-arrow"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-              </button>
+                <div class="sala-card-body">
+                  <span class="sala-card-label">SALA</span>
+                  <h3>{{ sala.name }}</h3>
+                  <p>{{ sala.description || 'Sem descrição cadastrada.' }}</p>
+                </div>
+
+                <div class="sala-card-footer">
+                  <span class="sala-card-date">
+                    <Calendar aria-hidden="true" />
+                    <span>{{ formatarDataCriacao(sala) }}</span>
+                  </span>
+                  <span class="sala-card-open">
+                    Abrir sala
+                    <ChevronRight aria-hidden="true" />
+                  </span>
+                </div>
+                </button>
+                <ClassroomQuickActions
+                  v-if="!aluno"
+                  :classroom="sala"
+                  @updated="atualizarSala"
+                  @deleted="excluirSala"
+                  @notice="aviso = $event"
+                />
+              </article>
             </div>
 
             <div
@@ -231,17 +293,21 @@ onMounted(carregarSalas)
               </span>
 
               <strong>
-                Você ainda não possui salas.
+                {{ aluno
+                  ? 'Você ainda não está matriculado em nenhuma sala.'
+                  : 'Você ainda não possui salas.' }}
               </strong>
 
               <p>
-                Crie uma sala para organizar alunos,
-                atividades e entregas.
+                {{ aluno
+                  ? 'Suas salas aparecerão aqui quando você for matriculado.'
+                  : 'Crie uma sala para organizar alunos, atividades e entregas.' }}
               </p>
 
               <button
                 type="button"
                 class="salas-empty-button"
+                v-if="!aluno"
                 @click="abrirDialogCriacao"
               >
                 Criar primeira sala
@@ -250,16 +316,17 @@ onMounted(carregarSalas)
           </section>
         </template>
       </main>
-    </SidebarMain>
+    </component>
 
     <ClassroomDialog
+      v-if="!aluno"
       v-model:visible="classroomDialogVisible"
       mode="create"
       :saving="salvandoSala"
       :error="erroClassroomDialog"
       @submit="criarNovaSala"
     />
-  </SidebarLayout>
+  </component>
 </template>
 
 <style src="./estilos.css"></style>

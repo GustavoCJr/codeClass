@@ -2,71 +2,101 @@ import { supabase } from '../../config/supabase'
 
 const apiUrl = import.meta.env.VITE_API_URL
 
+function destinoPorRole(role) {
+  if (role === 'student') {
+    return '/dashboardAluno.html'
+  }
+
+  if (
+    role === 'owner' ||
+    role === 'admin' ||
+    role === 'teacher'
+  ) {
+    return '/dashboardProfessor.html'
+  }
+
+  return null
+}
+
+async function mensagemErroApi(response) {
+  try {
+    const body = await response.json()
+
+    if (typeof body?.detail === 'string') {
+      return body.detail
+    }
+  } catch {
+    // O fallback abaixo cobre respostas sem JSON.
+  }
+
+  return 'Não foi possível validar seu acesso institucional.'
+}
+
 export async function autenticarUsuario({
   identificador,
   senha,
   manterConectado
 }) {
-  const email = identificador?.trim()
+  const email = String(
+    identificador || ''
+  ).trim()
 
   if (!email || !senha) {
-    throw new Error('Informe seu e-mail e sua senha.')
+    throw new Error(
+      'Informe seu usuário ou e-mail e sua senha.'
+    )
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const {
+    data,
+    error
+  } = await supabase.auth.signInWithPassword({
     email,
     password: senha
   })
 
-  if (error) {
-    if (
-      error.code === 'invalid_credentials' ||
-      error.message === 'Invalid login credentials'
-    ) {
-      throw new Error('E-mail ou senha inválidos.')
-    }
-
+  if (error || !data?.session) {
     throw new Error(
-      'Não foi possível entrar agora. Tente novamente.'
+      'E-mail ou senha inválidos.'
     )
   }
 
-  if (!data.user || !data.session) {
-    throw new Error('Não foi possível criar sua sessão.')
-  }
-
-  const response = await fetch(`${apiUrl}/api/v1/users/me`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${data.session.access_token}`
+  const response = await fetch(
+    `${apiUrl}/api/v1/users/me`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${data.session.access_token}`
+      }
     }
-  })
+  )
 
   if (!response.ok) {
-    throw new Error(
-      'Login realizado, mas não foi possível carregar seu perfil.'
-    )
+    const mensagem =
+      await mensagemErroApi(response)
+
+    await supabase.auth.signOut()
+
+    throw new Error(mensagem)
   }
 
   const perfil = await response.json()
+  const redirectUrl =
+    destinoPorRole(perfil.role)
 
-  let redirectUrl = null
+  if (!redirectUrl) {
+    await supabase.auth.signOut()
 
-  if (
-    perfil.role === 'owner' ||
-    perfil.role === 'admin' ||
-    perfil.role === 'teacher'
-  ) {
-    redirectUrl = '/dashboardProfessor.html'
+    throw new Error(
+      'Seu perfil não possui uma área disponível no CodeClass.'
+    )
   }
 
   return {
     autenticado: true,
     manterConectado,
-    usuario: data.user,
-    sessao: data.session,
     perfil,
     redirectUrl,
-    mensagem: `Bem-vindo, ${perfil.full_name || perfil.email}!`
+    mensagem: 'Login realizado com sucesso.'
   }
 }

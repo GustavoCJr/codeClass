@@ -623,3 +623,70 @@
     transition: none;
   }
 }
+
+/* Etapa A — cabeçalho e indicadores da atividade docente. */
+.assignment-header--enhanced {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: clamp(1rem, 3vw, 1.6rem);
+  margin-bottom: 1.1rem;
+  background: var(--color-surface);
+}
+.assignment-header-main { display: flex; gap: 1rem; min-width: 0; flex: 1; }
+.assignment-header-symbol {
+  flex: 0 0 58px; width: 58px; height: 58px;
+  display: grid; place-items: center;
+  color: var(--color-primary);
+  border-radius: 13px;
+  background: var(--color-surface-secondary);
+}
+.assignment-header--enhanced .assignment-header-copy { max-width: none; min-width: 0; }
+.assignment-header--enhanced h1 { font-size: clamp(1.5rem, 3vw, 2.25rem); overflow-wrap: anywhere; }
+.assignment-header--enhanced .assignment-header-copy > p { margin: .6rem 0 0; }
+.assignment-header-badges { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; margin-bottom: .8rem; }
+.assignment-type-badge, .assignment-status-badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .32rem .65rem; border-radius: 999px;
+  font-size: .72rem; font-weight: 750; letter-spacing: .025em;
+}
+.assignment-type-badge { background: var(--color-surface-secondary); color: var(--color-text); border: 1px solid var(--color-border); }
+.assignment-status-badge--andamento { background: #fef3c7; color: #92400e; }
+.assignment-status-badge--encerrada { background: #fee2e2; color: #991b1b; }
+.assignment-status-badge--sem-prazo { background: var(--color-surface-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+.assignment-header-meta--icons { margin-top: 1.2rem; gap: 1rem 1.7rem; }
+.assignment-header-meta-item { display: flex; align-items: flex-start; gap: .55rem; color: var(--color-text-secondary); }
+.assignment-header-meta-item > span { display: flex; flex-direction: column; gap: .15rem; font-size: .77rem; }
+.assignment-header-meta-item strong { font-size: .88rem; color: var(--color-text); }
+.assignment-header-actions { position: relative; flex: 0 0 40px; width: 40px; height: 40px; }
+.assignment-header-actions .cc-assignment-quick-actions { top: 0; right: 0; }
+.assignment-header--enhanced + .assignment-metrics { margin-bottom: 1.6rem; }
+.assignment-metric-label { display: flex; gap: .55rem; align-items: center; color: var(--color-text-secondary); }
+.assignment-metric .assignment-metric-label span { display: inline; opacity: 1; }
+.assignment-metric-label svg { flex: 0 0 auto; color: var(--color-primary); }
+@media (max-width: 700px) {
+  .assignment-header--enhanced { flex-direction: row; gap: .65rem; }
+  .assignment-header-main { gap: .7rem; }
+  .assignment-header-symbol { flex-basis: 42px; width: 42px; height: 42px; }
+  .assignment-header-actions { margin-left: auto; }
+}
+@media (max-width: 480px) {
+  .assignment-header-symbol { display: none; }
+  .assignment-header--enhanced { padding: 1rem; }
+}
+
+/* Etapa B — filtros locais e estados de entregas. */
+.assignment-delivery-toolbar { display: grid; grid-template-columns: minmax(180px, 1.5fr) repeat(2, minmax(155px, 1fr)); gap: .85rem; margin: 1.2rem 0 .65rem; }
+.assignment-delivery-field { display: flex; flex-direction: column; gap: .4rem; min-width: 0; }
+.assignment-delivery-field > span { display: flex; align-items: center; gap: .45rem; font-size: .78rem; font-weight: 700; color: var(--color-text-secondary); }
+.assignment-delivery-field input, .assignment-delivery-field select { box-sizing: border-box; width: 100%; min-height: 42px; padding: .65rem .75rem; border: 1px solid var(--color-border); border-radius: 9px; background: var(--color-surface); color: var(--color-text); font: inherit; }
+.assignment-delivery-field input:focus-visible, .assignment-delivery-field select:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.assignment-delivery-count { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .7rem; margin-bottom: .85rem; color: var(--color-text-secondary); font-size: .82rem; }
+.assignment-delivery-count > span { display: flex; align-items: center; gap: .5rem; }
+.assignment-delivery-count button, .assignment-delivery-clear { cursor: pointer; font: inherit; color: var(--color-link); background: transparent; border: 0; padding: .4rem; font-weight: 700; }
+.assignment-delivery-count button:focus-visible, .assignment-delivery-clear:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.assignment-delivery-status { display: inline-flex; width: fit-content; align-items: center; gap: .35rem; border-radius: 999px; padding: .28rem .55rem; font-size: .78rem; font-weight: 750; letter-spacing: normal; opacity: 1; }
+.assignment-delivery-status--revisao { background: #fef3c7; color: #92400e; }
+.assignment-delivery-status--publicado { background: #dcfce7; color: #166534; }
+.assignment-delivery-status--outro { background: var(--color-surface-secondary); color: var(--color-text); border: 1px solid var(--color-border); }
+@media (max-width: 900px) { .assignment-delivery-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); } .assignment-delivery-search { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .assignment-delivery-toolbar { grid-template-columns: 1fr; } .assignment-delivery-search { grid-column: auto; } }
