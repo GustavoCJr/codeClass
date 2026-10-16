@@ -2,9 +2,12 @@
 import { inject } from 'vue'
 import { routeLocationKey, onBeforeRouteLeave } from 'vue-router'
 import { useProfessorNavigation } from '../../router/professorNavigation'
+import { useAlunoNavigation } from '../../router/alunoNavigation'
 const props = defineProps({ embedded: { type: Boolean, default: false } })
 const route = inject(routeLocationKey, null)
-const navegar = useProfessorNavigation()
+const navegarProfessor = useProfessorNavigation()
+const navegarAluno = useAlunoNavigation()
+const navegar = (url) => (alunoNaPaginaSala() ? navegarAluno(url) : navegarProfessor(url))
 import {
   computed,
   onMounted,

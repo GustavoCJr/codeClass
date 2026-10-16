@@ -1,4 +1,5 @@
 <script setup>
+const props = defineProps({ embedded: { type: Boolean, default: false } })
 import {
   onMounted,
   ref
@@ -73,10 +74,10 @@ onMounted(carregarDashboard)
 </script>
 
 <template>
-  <SidebarLayout class="student-dashboard-layout">
-    <SidebarAluno />
+  <component :is="embedded ? 'div' : SidebarLayout" class="student-dashboard-layout">
+    <SidebarAluno v-if="!embedded" />
 
-    <SidebarMain>
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="student-dashboard">
         <section
           v-if="carregando"
@@ -392,8 +393,8 @@ onMounted(carregarDashboard)
           </a>
         </template>
       </main>
-    </SidebarMain>
-  </SidebarLayout>
+    </component>
+  </component>
 </template>
 
 <style src="./estilos.css"></style>

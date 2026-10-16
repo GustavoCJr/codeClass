@@ -1,6 +1,9 @@
 <script setup>
 import { useProfessorNavigation } from '../../router/professorNavigation'
-const navegar = useProfessorNavigation()
+import { useAlunoNavigation } from '../../router/alunoNavigation'
+const navegarProfessor = useProfessorNavigation()
+const navegarAluno = useAlunoNavigation()
+const navegar = (url) => (alunoNaPaginaSalas() ? navegarAluno(url) : navegarProfessor(url))
 const props = defineProps({ embedded: { type: Boolean, default: false } })
 
 import {

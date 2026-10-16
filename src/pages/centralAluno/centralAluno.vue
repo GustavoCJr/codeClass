@@ -1,4 +1,5 @@
 <script setup>
+const props = defineProps({ embedded: { type: Boolean, default: false }, mode: { type: String, default: '' } })
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
@@ -7,7 +8,7 @@ import { buscarCentralAluno, statusAluno } from './service'
 import '../atividade/estilos.css'
 import '../atividade/aluno.css'
 
-const resultados = window.location.pathname === '/resultadosAluno.html'
+const resultados = props.mode ? props.mode === 'resultados' : window.location.pathname === '/resultadosAluno.html'
 const dados = ref({ salas: [], atividades: [], avisos: [] })
 const carregando = ref(true)
 const erro = ref('')
@@ -35,7 +36,7 @@ onMounted(() => { carregar(); timer = window.setInterval(() => { agora.value = D
 onUnmounted(() => window.clearInterval(timer))
 </script>
 <template>
-  <SidebarLayout><SidebarAluno /><SidebarMain>
+  <component :is="embedded ? 'div' : SidebarLayout"><SidebarAluno v-if="!embedded" /><component :is="embedded ? 'div' : SidebarMain">
     <main class="assignment-page student-assignment">
       <header class="assignment-header"><div><h1>{{ resultados ? 'Meus resultados' : 'Minhas tarefas' }}</h1><p>{{ resultados ? 'Consulte as notas e os feedbacks publicados.' : 'Acompanhe todas as atividades das suas salas.' }}</p></div><button class="assignment-secondary-button" :disabled="carregando" @click="carregar">Atualizar</button></header>
       <p v-if="carregando" role="status">Carregando...</p>
@@ -58,5 +59,5 @@ onUnmounted(() => window.clearInterval(timer))
         <p v-if="!lista.length" class="assignment-empty">{{ resultados ? 'Nenhum resultado publicado corresponde aos filtros.' : 'Nenhuma atividade corresponde aos filtros.' }}</p>
       </template>
     </main>
-  </SidebarMain></SidebarLayout>
+  </component></component>
 </template>

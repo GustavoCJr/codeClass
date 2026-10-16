@@ -1,5 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
+import { routerKey, routeLocationKey } from 'vue-router'
+import { converterLinkAluno } from '../router/alunoNavigation'
+const router = inject(routerKey, null)
+const route = inject(routeLocationKey, null)
 
 import logoCodeClass from '../assets/images/logo.png'
 
@@ -85,8 +89,7 @@ const itensMenu = [
 ]
 
 function itemAtivo(item) {
-  const pathname =
-    window.location.pathname
+  const pathname = route ? ({'/aluno/dashboard':'/dashboardAluno.html','/aluno/salas':'/salas.html','/aluno/sala':'/sala.html','/aluno/atividade':'/atividade.html','/aluno/tarefas':'/tarefasAluno.html','/aluno/resultados':'/resultadosAluno.html'}[route.path] || '') : window.location.pathname
 
   if (
     item.activePaths?.includes(
@@ -107,7 +110,9 @@ function navegar(item) {
     return
   }
 
-  window.location.href = item.url
+  const path = router && converterLinkAluno(item.url)
+  if (path) router.push(path)
+  else window.location.href = item.url
 }
 
 function abrirPerfil() {

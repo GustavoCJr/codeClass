@@ -1,5 +1,7 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+const props = defineProps({ embedded: { type: Boolean, default: false } })
+import { computed, onMounted, onUnmounted, ref, inject } from 'vue'
+import { routeLocationKey, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 import Dialog from 'primevue/dialog'
@@ -10,7 +12,8 @@ import { buscarAtividadeAluno, salvarRespostasAluno, testarCodigoAluno } from '.
 import { montarRespostas, recuperarRespostas } from './respostasAluno'
 import { iniciarCodigos, validarCodigo, formatarVeredito } from './codigoAluno'
 
-const assignmentId = new URLSearchParams(window.location.search).get('id')
+const route = inject(routeLocationKey, null)
+const assignmentId = route ? String(route.query.id || '') : new URLSearchParams(window.location.search).get('id')
 const dados = ref(null)
 const respostas = ref({})
 const linguagem = ref('')
@@ -151,6 +154,13 @@ function protegerSaida(event) {
   event.returnValue = ''
 }
 
+if (route) onBeforeRouteLeave(() => {
+  if (dados.value && alterado.value && !entregue.value && !window.confirm('Existem alterações não salvas. Deseja sair desta atividade?')) return false
+})
+if (route) onBeforeRouteUpdate(() => {
+  if (dados.value && alterado.value && !entregue.value && !window.confirm('Existem alterações não salvas. Deseja sair desta atividade?')) return false
+})
+
 onMounted(() => {
   carregar()
   timer = window.setInterval(() => { agora.value = Date.now() }, 1000)
@@ -163,9 +173,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <SidebarLayout>
-    <SidebarAluno />
-    <SidebarMain>
+  <component :is="embedded ? 'div' : SidebarLayout">
+    <SidebarAluno v-if="!embedded" />
+    <component :is="embedded ? 'div' : SidebarMain">
       <main class="assignment-page student-assignment">
         <div v-if="carregando" class="assignment-state" aria-live="polite">Carregando atividade...</div>
         <section v-else-if="erro" class="assignment-state assignment-state--error" role="alert">
@@ -370,8 +380,8 @@ onUnmounted(() => {
           <button type="button" class="student-submit-button" :disabled="bloqueado" @click="salvar(false)">{{ salvando ? 'Entregando...' : 'Confirmar entrega' }}</button>
         </template>
       </Dialog>
-    </SidebarMain>
-  </SidebarLayout>
+    </component>
+  </component>
 </template>
 
 <style src="./estilos.css"></style>

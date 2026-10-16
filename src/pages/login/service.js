@@ -4,7 +4,7 @@ const apiUrl = import.meta.env.VITE_API_URL
 
 function destinoPorRole(role) {
   if (role === 'student') {
-    return '/dashboardAluno.html'
+    return '/aluno.html#/aluno/dashboard'
   }
 
   if (
