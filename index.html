@@ -1,13 +1,1552 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="0;url=/login.html" />
-    <title>CodeClass</title>
+    <meta
+      name="description"
+      content="CodeClass — plataforma acadêmica para ensino de programação com salas, desafios de código, execução online e apoio de IA na correção."
+    />
+    <title>CodeClass — Ensino de programação em um só ambiente</title>
+    <link rel="icon" href="/landing/favicon.png" type="image/png" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    />
+    <style>
+      :root {
+        --green: #00BF63;
+        --green-2: #00A957;
+        --black: #080808;
+        --ink: #151515;
+        --paper: #F5F5F2;
+        --white: #FFFFFF;
+        --gray-1: #ECECEA;
+        --gray-2: #D8D8D4;
+        --gray-3: #9A9A94;
+        --gray-4: #5A5A56;
+        --max: 1240px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: Inter, Segoe UI, Arial, Helvetica, sans-serif;
+        color: var(--ink);
+        background: var(--white);
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        width: min(calc(100% - 40px), var(--max));
+        margin: auto;
+      }
+
+      .mono {
+        font-family: Consolas, Monaco, "Courier New", monospace;
+      }
+
+      .header {
+        position: fixed;
+        inset: 0 0 auto 0;
+        height: 74px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.96);
+        border-bottom: 1px solid var(--gray-2);
+        backdrop-filter: blur(12px);
+      }
+
+      .header-inner {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: 20px;
+        letter-spacing: -0.5px;
+      }
+
+      .brand-mark {
+        color: var(--green);
+        font-weight: 800;
+      }
+
+      .brand strong span {
+        color: var(--green);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      .nav a:not(.nav-cta) {
+        position: relative;
+        padding: 28px 0;
+      }
+
+      .nav a:not(.nav-cta)::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 20px;
+        width: 0;
+        height: 2px;
+        background: var(--green);
+        transition: 0.2s ease;
+      }
+
+      .nav a:not(.nav-cta):hover::after {
+        width: 100%;
+      }
+
+      .nav-cta {
+        padding: 12px 18px;
+        background: var(--black);
+        color: var(--white);
+        border: 1px solid var(--black);
+        transition: 0.2s ease;
+      }
+
+      .nav-cta:hover {
+        background: var(--green);
+        border-color: var(--green);
+        color: var(--black);
+      }
+
+      /* Ações de acesso juntas, sem esconder o cadastro em telas menores. */
+      .nav {
+        gap: clamp(10px, 1.6vw, 28px);
+      }
+
+      .nav-cta--register {
+        background: var(--green);
+        border-color: var(--green);
+        color: var(--black);
+      }
+
+      .nav-cta--register:hover {
+        background: var(--green-2);
+        border-color: var(--green-2);
+        color: var(--black);
+      }
+
+      .nav-cta-label-compact {
+        display: none;
+      }
+
+      .hero {
+        position: relative;
+        min-height: 790px;
+        padding: 150px 0 90px;
+        background: var(--black);
+        color: var(--white);
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        background-size: 58px 58px;
+        pointer-events: none;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 480px;
+        height: 480px;
+        right: -240px;
+        top: 125px;
+        border: 1px solid rgba(0, 191, 99, 0.35);
+        transform: rotate(45deg);
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1.03fr 0.97fr;
+        gap: 78px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-bottom: 26px;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 34px;
+        height: 2px;
+        background: var(--green);
+      }
+
+      .hero h1 {
+        font-size: clamp(50px, 5.6vw, 78px);
+        line-height: 0.98;
+        letter-spacing: -4px;
+        max-width: 760px;
+        font-weight: 800;
+      }
+
+      .hero h1 span {
+        color: var(--green);
+      }
+
+      .hero-copy {
+        margin-top: 28px;
+        color: #B4B4AF;
+        max-width: 640px;
+        font-size: 18px;
+        line-height: 1.7;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 34px;
+      }
+
+      .btn {
+        min-height: 50px;
+        padding: 0 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        transition: 0.2s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: var(--green);
+        color: var(--black);
+      }
+
+      .btn-primary:hover {
+        background: #00D56D;
+      }
+
+      .btn-outline {
+        border-color: #4B4B4B;
+        color: var(--white);
+      }
+
+      .btn-outline:hover {
+        border-color: var(--white);
+      }
+
+      .product-window {
+        background: #EFEFEC;
+        border: 1px solid #353535;
+        color: var(--black);
+        box-shadow: 22px 22px 0 rgba(0, 191, 99, 0.12);
+      }
+
+      .window-top {
+        height: 44px;
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .dots i {
+        width: 7px;
+        height: 7px;
+        background: #CCC;
+        display: block;
+      }
+
+      .dots i:first-child {
+        background: var(--green);
+      }
+
+      .window-body {
+        min-height: 390px;
+        display: grid;
+        grid-template-columns: 126px 1fr;
+      }
+
+      .mock-side {
+        background: #181818;
+        color: #B8B8B8;
+        padding: 20px 12px;
+        border-right: 1px solid #303030;
+      }
+
+      .mock-side b {
+        display: block;
+        margin-bottom: 24px;
+        color: var(--white);
+        font-size: 11px;
+      }
+
+      .mock-side span {
+        display: block;
+        margin-bottom: 17px;
+        font-size: 9px;
+      }
+
+      .mock-side .active {
+        color: var(--green);
+      }
+
+      .mock-main {
+        padding: 24px;
+      }
+
+      .mock-label {
+        font-size: 9px;
+        color: #777;
+        margin-bottom: 6px;
+      }
+
+      .mock-main h3 {
+        font-size: 17px;
+        margin-bottom: 20px;
+      }
+
+      .mock-room,.mock-task {
+        background: var(--white);
+        border: 1px solid var(--gray-2);
+      }
+
+      .mock-room {
+        padding: 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 10px;
+        font-size: 10px;
+      }
+
+      .mock-room small {
+        color: #858585;
+      }
+
+      .mock-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .mock-task {
+        padding: 13px;
+        min-height: 86px;
+      }
+
+      .mock-task b {
+        display: block;
+        color: var(--green);
+        font-size: 9px;
+        margin-bottom: 11px;
+      }
+
+      .mock-task p {
+        font-size: 9px;
+        line-height: 1.45;
+      }
+
+      .proof-strip {
+        border-bottom: 1px solid var(--gray-2);
+        background: var(--white);
+      }
+
+      .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-left: 1px solid var(--gray-2);
+      }
+
+      .proof {
+        min-height: 112px;
+        padding: 28px 24px;
+        border-right: 1px solid var(--gray-2);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .proof strong {
+        font-size: 26px;
+        letter-spacing: -1px;
+        margin-bottom: 5px;
+      }
+
+      .proof span {
+        color: var(--gray-3);
+        font-size: 10px;
+      }
+
+      .section {
+        padding: 115px 0;
+      }
+
+      .section-head {
+        display: grid;
+        grid-template-columns: 0.62fr 1.38fr;
+        gap: 60px;
+        margin-bottom: 64px;
+      }
+
+      .section-kicker {
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .section-head h2 {
+        max-width: 820px;
+        font-size: clamp(38px, 4.5vw, 60px);
+        line-height: 1.02;
+        letter-spacing: -2.7px;
+      }
+
+      .section-head p {
+        max-width: 690px;
+        margin-top: 22px;
+        color: var(--gray-4);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .section.code {
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-2);
+      }
+
+      .code-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+        gap: 72px;
+        align-items: center;
+      }
+
+      .code-content {
+        min-width: 0;
+      }
+
+      .code .section-head {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 42px;
+      }
+
+      .code .section-head h2 {
+        max-width: 640px;
+      }
+
+      .code .section-head p {
+        max-width: 620px;
+      }
+
+      .code .tech-row {
+        grid-template-columns: 56px minmax(150px, 0.75fr) minmax(0, 1.25fr);
+        gap: 20px;
+        padding: 22px 0;
+      }
+
+      .code-visual {
+        position: relative;
+        min-width: 0;
+        min-height: 520px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1300px;
+        overflow: visible;
+      }
+
+      .code-blob {
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        background: var(--green);
+        border-radius: 45% 55% 60% 40% / 50% 45% 55% 50%;
+        transform: rotate(-12deg);
+        opacity: 0.95;
+        z-index: 0;
+      }
+
+      .code-screen {
+        position: relative;
+        width: min(560px, 92%);
+        z-index: 2;
+        transform-style: preserve-3d;
+        transition:
+          transform 0.4s ease,
+          filter 0.4s ease;
+      }
+
+      .code-screen-main {
+        transform: rotateX(7deg) rotateY(-13deg) rotateZ(2deg)
+          translateY(-4px);
+      }
+
+      .code-screen img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow:
+          0 35px 60px rgba(0, 0, 0, 0.28),
+          0 12px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .code-visual:hover .code-screen-main {
+        transform: rotateX(4deg) rotateY(-8deg) rotateZ(0deg)
+          translateY(-12px) scale(1.015);
+      }
+
+      .code-floating-card {
+        position: absolute;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.97);
+        border: 1px solid var(--gray-2);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.13);
+        transition: transform 0.3s ease;
+      }
+
+      .code-floating-card .material-symbols-outlined {
+        color: var(--green);
+        font-size: 22px;
+      }
+
+      .code-floating-card strong {
+        display: block;
+        font-size: 11px;
+      }
+
+      .code-floating-card small {
+        display: block;
+        margin-top: 2px;
+        color: var(--gray-3);
+        font-size: 9px;
+      }
+
+      .code-card-ai {
+        top: 64px;
+        right: -4px;
+        transform: rotate(4deg);
+      }
+
+      .code-card-run {
+        bottom: 64px;
+        left: -8px;
+        transform: rotate(-4deg);
+      }
+
+      .code-visual:hover .code-card-ai {
+        transform: rotate(2deg) translateY(-8px);
+      }
+
+      .code-visual:hover .code-card-run {
+        transform: rotate(-2deg) translateY(-6px);
+      }
+
+      .problem {
+        background: var(--paper);
+        border-top: 1px solid var(--gray-2);
+        border-bottom: 1px solid var(--gray-2);
+      }
+
+      .problem-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: 1px solid var(--gray-2);
+        border-left: 1px solid var(--gray-2);
+      }
+
+      .problem-item {
+        min-height: 250px;
+        padding: 34px;
+        border-right: 1px solid var(--gray-2);
+        border-bottom: 1px solid var(--gray-2);
+        background: transparent;
+        transition: 0.2s ease;
+      }
+
+      .problem-item:hover {
+        background: var(--white);
+      }
+
+      .problem-item .n {
+        display: block;
+        color: var(--green);
+        font-size: 11px;
+        margin-bottom: 56px;
+      }
+
+      .problem-item h3 {
+        font-size: 24px;
+        letter-spacing: -0.7px;
+        margin-bottom: 12px;
+      }
+
+      .problem-item p {
+        color: var(--gray-4);
+        font-size: 14px;
+        line-height: 1.7;
+        max-width: 460px;
+      }
+
+      .flow {
+        background: var(--black);
+        color: var(--white);
+      }
+
+      .flow .section-head p {
+        color: #8E8E8A;
+      }
+
+      .flow-steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-left: 1px solid #313131;
+        border-top: 1px solid #313131;
+      }
+
+      .flow-step {
+        min-height: 320px;
+        padding: 32px 28px;
+        border-right: 1px solid #313131;
+        border-bottom: 1px solid #313131;
+      }
+
+      .flow-step .material-symbols-outlined{
+        color: var(--green);
+        font-size: 60px;
+        justify-self: center;
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 60px;
+      }
+      .flow-step .ia {
+        color: var(--green);
+        font-size: 60px;
+        justify-self: center;
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 40px;
+      }
+
+      .flow-step h3 {
+        font-size: 22px;
+        margin-bottom: 12px;
+      }
+
+      .flow-step p {
+        color: #8E8E8A;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+
+      .institution-grid .material-symbols-outlined{
+        color: var(--green);
+        font-size: 60px;
+        justify-self: center;
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 60px;
+      }
+
+      .audience-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: 1px solid var(--gray-2);
+        border-left: 1px solid var(--gray-2);
+      }
+
+      .audience-card {
+        padding: 38px;
+        min-height: 430px;
+        border-right: 1px solid var(--gray-2);
+        border-bottom: 1px solid var(--gray-2);
+      }
+
+      .audience-card.dark {
+        background: var(--ink);
+        color: var(--white);
+      }
+
+      .audience-card .role {
+        color: var(--green);
+        font-size: 11px;
+        margin-bottom: 50px;
+        display: block;
+      }
+
+      .audience-card h3 {
+        font-size: 34px;
+        letter-spacing: -1.3px;
+        margin-bottom: 26px;
+      }
+
+      .audience-card ul {
+        list-style: none;
+        display: grid;
+        gap: 16px;
+      }
+
+      .audience-card li {
+        padding-top: 14px;
+        border-top: 1px solid var(--gray-2);
+        font-size: 14px;
+        color: var(--gray-4);
+      }
+
+      .audience-card.dark li {
+        border-color: #333;
+        color: #A1A19C;
+      }
+
+      .audience-card li::before {
+        content: "→";
+        color: var(--green);
+        margin-right: 10px;
+      }
+
+      .ai {
+        background: var(--paper);
+        border-top: 1px solid var(--gray-2);
+        border-bottom: 1px solid var(--gray-2);
+      }
+
+      .ai-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 76px;
+        align-items: center;
+      }
+
+      .ai-panel {
+        background: #111;
+        color: #EEE;
+        border: 1px solid #2C2C2C;
+        min-height: 420px;
+        padding: 24px;
+      }
+      .ai-panel span {
+        display: flex;
+        justify-content: center;
+        font-family: Consolas, Monaco, "Courier New", monospace;
+        color: var(--green);
+      }
+
+      .ai-panel img {
+        transition: transform 0.2s ease;
+      }
+
+      .ai-panel img:hover {
+        transform: translateY(-8px);
+      }
+
+      .ai-panel-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #303030;
+        padding-bottom: 14px;
+        margin-bottom: 22px;
+        font-size: 10px;
+      }
+
+      .code-line {
+        font-size: 12px;
+        line-height: 1.9;
+        color: #CFCFCF;
+      }
+
+      .code-line .g {
+        color: var(--green);
+      }
+
+      .ai-note {
+        margin-top: 24px;
+        border-left: 3px solid var(--green);
+        background: #171717;
+        padding: 16px;
+        font-size: 12px;
+        line-height: 1.65;
+        color: #BDBDB8;
+      }
+
+      .ai-copy h2 {
+        font-size: clamp(38px, 4.3vw, 58px);
+        line-height: 1.04;
+        letter-spacing: -2.3px;
+        margin-bottom: 22px;
+      }
+
+      .ai-copy p {
+        color: var(--gray-4);
+        line-height: 1.8;
+        margin-bottom: 18px;
+      }
+
+      .ai-copy strong {
+        color: var(--ink);
+      }
+
+      .tech-list {
+        border-top: 1px solid var(--gray-2);
+      }
+
+      .tech-row {
+        display: grid;
+        grid-template-columns: 90px 1fr 1fr;
+        gap: 28px;
+        padding: 30px 0;
+        border-bottom: 1px solid var(--gray-2);
+        align-items: start;
+      }
+
+      .tech-row .n {
+        color: var(--green);
+        font-size: 11px;
+      }
+
+      .tech-row h3 {
+        font-size: 23px;
+        letter-spacing: -0.6px;
+      }
+
+      .tech-row p {
+        color: var(--gray-4);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .institution {
+        background: var(--black);
+        color: var(--white);
+      }
+
+      .institution .section-head p {
+        color: #8A8A86;
+      }
+
+      .institution-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-left: 1px solid #303030;
+        border-top: 1px solid #303030;
+      }
+
+      .institution-item {
+        min-height: 245px;
+        padding: 30px;
+        border-right: 1px solid #303030;
+        border-bottom: 1px solid #303030;
+      }
+
+      .institution-item b {
+        color: var(--green);
+        font-size: 11px;
+        display: block;
+        margin-bottom: 52px;
+      }
+
+      .institution-item h3 {
+        font-size: 22px;
+        margin-bottom: 12px;
+      }
+
+      .institution-item p {
+        color: #8E8E89;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .cta {
+        border-bottom: 1px solid var(--gray-2);
+      }
+
+      .cta-inner {
+        padding: 78px 0;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 50px;
+        align-items: center;
+      }
+
+      .cta h2 {
+        max-width: 850px;
+        font-size: clamp(40px, 5vw, 68px);
+        line-height: 0.98;
+        letter-spacing: -3px;
+      }
+
+      .cta h2 span {
+        color: var(--green);
+      }
+
+      .cta-link {
+        width: min(100%, 288px);
+        min-height: 60px;
+        padding: 0 18px;
+        text-align: center;
+        background: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 13px;
+        transition: 0.2s ease;
+      }
+
+      .cta-link:hover {
+        background: var(--black);
+        color: var(--white);
+      }
+
+      .footer {
+        padding: 50px 0 26px;
+      }
+
+      .footer-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 40px;
+        padding-bottom: 42px;
+      }
+
+      .footer-copy {
+        max-width: 390px;
+        color: var(--gray-3);
+        font-size: 13px;
+        margin-top: 14px;
+        line-height: 1.7;
+      }
+
+      .footer-nav {
+        display: flex;
+        gap: 26px;
+        align-items: flex-start;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .footer-nav a:hover {
+        color: var(--green);
+      }
+
+      .footer-bottom {
+        border-top: 1px solid var(--gray-2);
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        color: var(--gray-3);
+        font-size: 10px;
+      }
+
+      @media (max-width:980px) {
+        .hero-grid,.ai-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-head {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .proof-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .flow-steps {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .code-grid {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+
+        .code-visual {
+          width: 100%;
+          max-width: 900px;
+          min-height: 470px;
+          margin: 0 auto;
+        }
+
+        .code-blob {
+          width: 390px;
+          height: 390px;
+        }
+
+        .code-screen {
+          width: min(600px, 86%);
+        }
+
+        .institution-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .tech-row {
+          grid-template-columns: 60px 1fr;
+        }
+
+        .tech-row p {
+          grid-column: 2;
+        }
+
+        .cta-inner {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width:1100px) {
+        .nav a:not(.nav-cta) {
+          display: none;
+        }
+      }
+
+      @media (max-width:720px) {
+        .container {
+          width: min(calc(100% - 28px), var(--max));
+        }
+
+        .header-inner {
+          gap: 10px;
+        }
+
+        .header .brand img {
+          width: 52px;
+          height: 52px;
+        }
+
+        .header .brand {
+          font-size: 16px;
+          gap: 6px;
+        }
+
+        .nav {
+          gap: 8px;
+          font-size: 11px;
+        }
+
+        .nav-cta {
+          padding: 10px 12px;
+          white-space: nowrap;
+        }
+
+        .nav-cta-label-full {
+          display: none;
+        }
+
+        .nav-cta-label-compact {
+          display: inline;
+        }
+
+        .hero {
+          min-height: auto;
+          padding: 125px 0 70px;
+        }
+
+        .hero h1 {
+          letter-spacing: -2.4px;
+        }
+
+        .hero-actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .window-body {
+          grid-template-columns: 1fr;
+        }
+
+        .mock-side {
+          display: none;
+        }
+
+        .proof-grid,.problem-grid,.flow-steps,.audience-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section {
+          padding: 82px 0;
+        }
+
+        .section-head {
+          margin-bottom: 44px;
+        }
+
+        .problem-item,.flow-step,.audience-card {
+          min-height: auto;
+        }
+
+        .problem-item .n,.flow-step .n,.audience-card .role {
+          margin-bottom: 34px;
+        }
+
+        .tech-row {
+          grid-template-columns: 1fr;
+        }
+
+        .tech-row p {
+          grid-column: auto;
+        }
+
+        .code-grid {
+          gap: 36px;
+        }
+
+        .code .section-head {
+          margin-bottom: 32px;
+        }
+
+        .code-visual {
+          min-height: 350px;
+        }
+
+        .code-blob {
+          width: 275px;
+          height: 275px;
+        }
+
+        .code-screen {
+          width: 88%;
+        }
+
+        .code-screen-main,
+        .code-visual:hover .code-screen-main {
+          transform: rotateX(5deg) rotateY(-8deg) rotateZ(1deg);
+        }
+
+        .code-card-ai,
+        .code-card-run {
+          display: none;
+        }
+
+        .cta-link {
+          width: 100%;
+        }
+
+        .footer-top,.footer-bottom {
+          flex-direction: column;
+        }
+
+        .footer-nav {
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width:420px) {
+        .header .brand strong {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <a href="/login.html">Entrar no CodeClass</a>
+    <header class="header">
+      <div class="container header-inner">
+        <a href="#inicio" class="brand">
+          <img src="/landing/img/logo.png" alt="CodeClass" width="80" height="80" />
+          <strong>Code<span>Class</span></strong>
+        </a>
+        <nav class="nav">
+          <a href="#produto">PRODUTO</a>
+          <a href="#professores">PROFESSORES</a>
+          <a href="#ia">IA</a>
+          <a href="#instituicoes">INSTITUIÇÕES</a>
+          <a href="/login.html" class="nav-cta">ENTRAR</a>
+          <a href="/cadastroOrganizacao.html" class="nav-cta nav-cta--register" aria-label="Cadastrar organização">
+            <span class="nav-cta-label-full">CADASTRAR ORGANIZAÇÃO</span>
+            <span class="nav-cta-label-compact" aria-hidden="true">CADASTRAR</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="hero" id="inicio">
+        <div class="container hero-grid">
+          <div>
+            <div class="eyebrow mono">CODECLASS / ENSINO DE PROGRAMAÇÃO</div>
+            <h1>Ensine programação.<br>Nós cuidamos do <span>ambiente.</span></h1>
+            <p class="hero-copy">
+              Crie turmas, publique desafios de código, acompanhe entregas e corrija atividades com apoio de inteligência artificial — tudo em uma única plataforma acadêmica.
+            </p>
+            <div class="hero-actions">
+              <a href="/cadastroOrganizacao.html" class="btn btn-primary">CADASTRAR SUA INSTITUIÇÃO</a>
+              <a href="#produto" class="btn btn-outline">CONHECER A PLATAFORMA</a>
+            </div>
+          </div>
+          <div class="product-window">
+            <div class="window-top mono">
+              <span>&lt; CODECLASS /&gt;</span>
+              <span class="dots"><i></i><i></i><i></i></span>
+            </div>
+            <div class="window-body">
+              <aside class="mock-side mono">
+                <b>./inicio</b>
+                <span class="active">01 / salas</span>
+                <span>02 / tarefas</span>
+                <span>03 / materiais</span>
+                <span>04 / mensagens</span>
+              </aside>
+              <div class="mock-main">
+                <div class="mock-label mono">PAINEL DO PROFESSOR</div>
+                <h3 class="mono">Acompanhe a turma em um único lugar.</h3>
+                <div class="mock-room mono">
+                  <strong>&lt; Lógica de Programação /&gt;</strong>
+                  <small>45 alunos</small>
+                </div>
+                <div class="mock-room mono">
+                  <strong>&lt; Estruturas de Dados /&gt;</strong>
+                  <small>32 alunos</small>
+                </div>
+                <div class="mock-cols">
+                  <div class="mock-task">
+                    <b class="mono">ENTREGAS</b>
+                    <p>12 atividades aguardando correção.</p>
+                  </div>
+                  <div class="mock-task">
+                    <b class="mono">ANÁLISE IA</b>
+                    <p>Feedback técnico disponível para novas submissões.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="proof-strip">
+        <div class="container proof-grid">
+          <div class="proof"><strong>01.</strong><span class="mono">SALAS DE AULA VIRTUAIS</span></div>
+          <div class="proof"><strong>02.</strong><span class="mono">EDITOR + EXECUÇÃO DE CÓDIGO</span></div>
+          <div class="proof"><strong>03.</strong><span class="mono">CORREÇÃO COM APOIO DE IA</span></div>
+          <div class="proof"><strong>04.</strong><span class="mono">FOCO ACADÊMICO</span></div>
+        </div>
+      </section>
+      <section class="section problem" id="produto">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-kicker mono">01 / O PROBLEMA</div>
+            <div>
+              <h2>O ensino de programação não deveria depender de arquivos espalhados.</h2>
+              <p>
+                Quando o aluno programa localmente, envia arquivos e o professor precisa baixar, executar e corrigir cada entrega separadamente, a atividade prática vira um processo fragmentado. A CodeClass foi pensada para centralizar esse fluxo.
+              </p>
+            </div>
+          </div>
+          <div class="problem-grid">
+            <article class="problem-item">
+              <span class="n mono">01 / ENTREGA</span>
+              <h3>Sem troca de arquivos soltos.</h3>
+              <p>O aluno realiza e envia a atividade diretamente pelo ambiente da disciplina.</p>
+            </article>
+            <article class="problem-item">
+              <span class="n mono">02 / EXECUÇÃO</span>
+              <h3>Código executado no navegador.</h3>
+              <p>Editor com realce de sintaxe e execução online para reduzir atrito durante os exercícios.</p>
+            </article>
+            <article class="problem-item">
+              <span class="n mono">03 / CORREÇÃO</span>
+              <h3>Uma fila de correção organizada.</h3>
+              <p>O professor acompanha atividades, entregas e devolutivas dentro da própria sala.</p>
+            </article>
+            <article class="problem-item">
+              <span class="n mono">04 / COMUNICAÇÃO</span>
+              <h3>Professor e aluno no mesmo contexto.</h3>
+              <p>Materiais, mensagens, tarefas e feedback ficam associados ao ambiente acadêmico.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section flow">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-kicker mono">02 / FLUXO</div>
+            <div>
+              <h2>Do enunciado à devolutiva, sem sair da plataforma.</h2>
+              <p>
+                A CodeClass organiza a jornada completa de uma atividade prática: publicação, desenvolvimento, execução, entrega, análise e correção.
+              </p>
+            </div>
+          </div>
+          <div class="flow-steps">
+            <article class="flow-step">
+              <span class="material-symbols-outlined">auto_stories</span>
+              <h3>Professor publica.</h3>
+              <p>Crie desafios de codificação com enunciado, prazo, anexos e linguagens permitidas.</p>
+            </article>
+            <article class="flow-step">
+              <span class="material-symbols-outlined">code</span>
+              <h3>Aluno desenvolve.</h3>
+              <p>Escreva o código no editor online com syntax highlighting e teste a solução.</p>
+            </article>
+            <article class="flow-step">
+              <img src="/landing/img/ia_icon.png" alt="IA" width="80" height="80" class="ia" />
+              <h3>IA analisa.</h3>
+              <p>A submissão pode receber uma análise técnica que destaca melhorias para apoiar a correção.</p>
+            </article>
+            <article class="flow-step">
+              <span class="material-symbols-outlined">forward_to_inbox</span>
+              <h3>Professor devolve.</h3>
+              <p>Finalize a correção com comentários, nota e orientações personalizadas ao aluno.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="professores">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-kicker mono">03 / PARA QUEM USA</div>
+            <div>
+              <h2>Uma experiência para quem ensina e para quem aprende.</h2>
+              <p>
+                Professores ganham controle sobre o processo de avaliação; alunos ganham clareza sobre tarefas, prazos e feedbacks.
+              </p>
+            </div>
+          </div>
+          <div class="audience-grid">
+            <article class="audience-card dark">
+              <span class="role mono">PROFESSORES</span>
+              <h3>Mais controle sobre atividades práticas.</h3>
+              <ul>
+                <li>Criar e gerenciar salas de aula virtuais</li>
+                <li>Publicar materiais e atividades</li>
+                <li>Acompanhar entregas dos alunos</li>
+                <li>Corrigir tarefas e enviar devolutivas</li>
+                <li>Usar análise de IA como apoio à correção</li>
+              </ul>
+            </article>
+            <article class="audience-card">
+              <span class="role mono">ALUNOS</span>
+              <h3>Menos ferramentas. Mais foco no código.</h3>
+              <ul>
+                <li>Acessar múltiplas salas de aula</li>
+                <li>Visualizar tarefas e prazos pendentes</li>
+                <li>Programar em editor online</li>
+                <li>Executar e testar soluções</li>
+                <li>Receber devolutivas do professor</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section ai" id="ia">
+        <div class="container ai-grid">
+          <div class="ai-panel">
+            <img src="/landing/img/ia_icon.png" alt="Painel de análise de IA" width="100%" height="100%" />
+          </div>
+          <div class="ai-copy">
+            <div class="eyebrow mono">SNEK - SUA ASSISTENTE PARTICULAR</div>
+            <h2>Ajuda para corrigir. Não para substituir o professor.</h2>
+            <p>
+              A análise automatizada pode destacar pontos de melhoria na resposta enviada pelo aluno e disponibilizar essas observações ao professor durante a correção.
+            </p>
+            <p>
+              O resultado final continua no contexto pedagógico de quem conhece a turma:
+              <strong>o professor.</strong>
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="section code" id="codigo">
+        <div class="container code-grid">
+          <div class="code-content">
+            <div class="section-head">
+              <div class="section-kicker mono">04 / AMBIENTE DE CÓDIGO</div>
+              <div>
+                <h2>Escreva, execute e entregue código no mesmo lugar.</h2>
+                <p>
+                  O ambiente foi planejado para atividades práticas de programação, com editor online, realce de sintaxe e execução de código em ambiente isolado.
+                </p>
+              </div>
+            </div>
+
+            <div class="tech-list">
+              <article class="tech-row">
+                <span class="n mono">01</span>
+                <h3>Editor de código</h3>
+                <p>Suporte a syntax highlighting para tornar o desenvolvimento mais claro durante a atividade.</p>
+              </article>
+
+              <article class="tech-row">
+                <span class="n mono">02</span>
+                <h3>Execução online</h3>
+                <p>
+                  Compilação e interpretação em ambiente isolado, reduzindo a dependência da configuração local do aluno.
+                </p>
+              </article>
+
+              <article class="tech-row">
+                <span class="n mono">03</span>
+                <h3>Múltiplas linguagens</h3>
+                <p>Estrutura prevista para JavaScript, Python, Java, C e C++ em atividades de codificação.</p>
+              </article>
+
+              <article class="tech-row">
+                <span class="n mono">04</span>
+                <h3>Mais de um tipo de atividade</h3>
+                <p>Além de desafios de código, a plataforma prevê questionários e atividades do tipo trivia.</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="code-visual">
+            <div class="code-blob"></div>
+
+            <div class="code-screen code-screen-main">
+              <img
+                src="/landing/img/telaEditorTexto.png"
+                alt="Ambiente de codificação da CodeClass"
+              />
+            </div>
+
+            <div class="code-floating-card code-card-ai">
+              <span class="material-symbols-outlined">auto_awesome</span>
+              <div>
+                <strong>Análise da IA</strong>
+                <small>Feedback disponível</small>
+              </div>
+            </div>
+
+            <div class="code-floating-card code-card-run">
+              <span class="material-symbols-outlined">play_arrow</span>
+              <div>
+                <strong>Código executado</strong>
+                <small>0 erros encontrados</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section institution" id="instituicoes">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-kicker mono">05 / INSTITUIÇÕES</div>
+            <div>
+              <h2>Uma plataforma desenhada para o contexto acadêmico.</h2>
+              <p>
+                A CodeClass não tenta ser uma sala virtual genérica. O foco está em cursos, disciplinas e instituições que ensinam desenvolvimento de software.
+              </p>
+            </div>
+          </div>
+          <div class="institution-grid">
+            <article class="institution-item">
+              <span class="material-symbols-outlined">responsive_layout</span>
+              <h3>Acesso em diferentes dispositivos.</h3>
+              <p>Interface projetada para funcionar em navegadores modernos e se adaptar a diferentes telas.</p>
+            </article>
+            <article class="institution-item">
+              <span class="material-symbols-outlined">security</span>
+              <h3>Execução de código isolada.</h3>
+              <p>
+                O ambiente de execução foi pensado para manter códigos submetidos pelos alunos separados da infraestrutura principal.
+              </p>
+            </article>
+            <article class="institution-item">
+              <span class="material-symbols-outlined">privacy_tip</span>
+              <h3>Requisitos alinhados à LGPD.</h3>
+              <p>
+                O projeto prevê práticas de proteção de dados e autenticação adequadas ao contexto de uma plataforma acadêmica.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="cta">
+        <div class="container cta-inner">
+          <h2>
+            Transforme atividades de programação em uma experiência
+            <span>mais simples de ensinar.</span>
+          </h2>
+          <a href="/cadastroOrganizacao.html" class="cta-link">CADASTRAR SUA INSTITUIÇÃO →</a>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-top">
+          <div>
+            <a href="#inicio" class="brand">
+              <img src="/landing/img/logo.png" alt="CodeClass" width="60" height="60" />
+              <strong>Code<span>Class</span></strong>
+            </a>
+            <p class="footer-copy">
+              Plataforma acadêmica voltada ao ensino prático de programação, conectando professores, alunos, código e feedback.
+            </p>
+          </div>
+          <nav class="footer-nav">
+            <a href="#produto">PRODUTO</a>
+            <a href="#professores">PROFESSORES</a>
+            <a href="#ia">IA</a>
+            <a href="#instituicoes">INSTITUIÇÕES</a>
+            <a href="/login.html">ENTRAR</a>
+          </nav>
+        </div>
+        <div class="footer-bottom mono">
+          <span>CODECLASS © 2026</span>
+          <span>PLATAFORMA ACADÊMICA PARA ENSINO DE PROGRAMAÇÃO</span>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

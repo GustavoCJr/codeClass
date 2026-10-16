@@ -7,6 +7,7 @@ import Atividade from '../pages/atividade/atividade.vue'
 import CriarTarefa from '../pages/criarTarefa/criarTarefa.vue'
 import CorrigirEntrega from '../pages/corrigirEntrega/corrigirEntrega.vue'
 import Alunos from '../pages/alunos/alunos.vue'
+import PerfilProfessor from '../pages/perfilProfessor/perfilProfessor.vue'
 import { obterPerfilDaPagina } from '../config/auth'
 
 export const router = createRouter({
@@ -21,6 +22,7 @@ export const router = createRouter({
     { path: '/professor/atividade', component: Atividade, props: { embedded: true } },
     { path: '/professor/criar-tarefa', component: CriarTarefa, props: { embedded: true } },
     { path: '/professor/corrigir-entrega', component: CorrigirEntrega, props: { embedded: true } },
+    { path: '/professor/perfil', component: PerfilProfessor },
     { path: '/professor/alunos', component: Alunos, props: { embedded: true }, beforeEnter: () => ['owner', 'admin'].includes(obterPerfilDaPagina()?.role) || '/professor/dashboard' },
     { path: '/:pathMatch(.*)*', redirect: '/professor/dashboard' }
   ]

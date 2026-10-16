@@ -2,6 +2,7 @@
 // v3: Salas abre /salas.html; /sala.html apenas mantém o item ativo
 import { computed, inject, ref } from 'vue'
 import { routerKey, routeLocationKey } from 'vue-router'
+import { converterLinkProfessor } from '../router/professorNavigation'
 
 import logoCodeClass from '../assets/images/logo.png'
 import Sidebar from 'primevue/sidebar'
@@ -104,7 +105,7 @@ function itemAtivo(item) {
     return false
   }
 
-  const pathname = spaAtiva.value ? ({ '/professor/dashboard': '/dashboardProfessor.html', '/professor/salas': '/salas.html', '/professor/tarefas': '/tarefas.html', '/professor/correcoes': '/correcoes.html' }[route.path] || route.path) : window.location.pathname
+  const pathname = spaAtiva.value ? ({ '/professor/dashboard': '/dashboardProfessor.html', '/professor/salas': '/salas.html', '/professor/sala': '/sala.html', '/professor/tarefas': '/tarefas.html', '/professor/correcoes': '/correcoes.html', '/professor/atividade': '/atividade.html', '/professor/criar-tarefa': '/criarTarefa.html', '/professor/corrigir-entrega': '/corrigirEntrega.html', '/professor/alunos': '/alunos.html' }[route.path] || route.path) : window.location.pathname
   if (item.url === '/correcoes.html' && pathname === '/corrigirEntrega.html') return true
   if (item.url === '/tarefas.html' && ['/atividade.html', '/criarTarefa.html'].includes(pathname)) return true
 
@@ -125,10 +126,8 @@ function navegar(item) {
     return
   }
 
-  if (spaAtiva.value && item.url === '/dashboardProfessor.html') { router.push('/professor/dashboard'); return }
-  if (spaAtiva.value && item.url === '/salas.html') { router.push('/professor/salas'); return }
-  if (spaAtiva.value && item.url === '/tarefas.html') { router.push('/professor/tarefas'); return }
-  if (spaAtiva.value && item.url === '/correcoes.html') { router.push('/professor/correcoes'); return }
+  const destino = spaAtiva.value && converterLinkProfessor(item.url)
+  if (destino) { router.push(destino); return }
   window.location.href = item.url
 }
 
@@ -137,10 +136,11 @@ function navegar(item) {
    ================================================== */
 
 function abrirPerfil() {
-  /*
-   * Futuramente:
-   * window.location.href = '/perfil.html'
-   */
+  if (spaAtiva.value && router) {
+    router.push('/professor/perfil')
+    return
+  }
+  window.location.href = '/professor.html#/professor/perfil'
 }
 
 async function sair() {
@@ -299,6 +299,8 @@ async function sair() {
               type="button"
               :title="sidebarAberta ? null : 'Perfil'"
               aria-label="Abrir perfil"
+              :aria-current="spaAtiva && route?.path === '/professor/perfil' ? 'page' : undefined"
+              :class="{ 'cc-sidebar-footer-button-active': spaAtiva && route?.path === '/professor/perfil' }"
               @click="abrirPerfil"
             >
               <span class="cc-sidebar-icon">
