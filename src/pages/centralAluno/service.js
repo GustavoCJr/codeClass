@@ -1,21 +1,28 @@
 import { api } from '../../config/api'
 
-export function statusAluno(atividade, submissao, agora = Date.now()) {
-  if (submissao?.status === 'published') return 'published'
-  if (['pending', 'awaiting_review'].includes(submissao?.status)) return submissao.status
-  if (atividade.deadline && new Date(atividade.deadline).getTime() < agora) return 'late'
-  return submissao?.status === 'draft' ? 'draft' : 'open'
+// A situação é calculada pelo backend. Rascunho é uma indicação adicional,
+// não um status de entrega formal.
+export function statusAluno(atividade) {
+  return atividade.student_status || 'pending'
 }
 
 export async function buscarCentralAluno() {
-  const [salas, submissoes] = await Promise.all([api('/classrooms/my-classes'), api('/submissions')])
-  const mapa = new Map(submissoes.map(submissao => [submissao.assignment.id, submissao]))
-  const grupos = await Promise.allSettled(salas.map(sala => api(`/classrooms/${encodeURIComponent(sala.id)}/assignments`)))
-  const avisos = []
-  const atividades = grupos.flatMap((grupo, index) => {
-    const sala = salas[index]
-    if (grupo.status === 'rejected') { avisos.push(`Não foi possível carregar ${sala.name}: ${grupo.reason.message}`); return [] }
-    return grupo.value.map(atividade => ({ ...atividade, sala, submissao: mapa.get(atividade.id) }))
+  const tarefas = await api('/assignments/my-assignments')
+  if (!Array.isArray(tarefas)) {
+    throw new Error('Resposta inesperada ao carregar suas atividades.')
+  }
+
+  const salasMap = new Map()
+  const atividades = tarefas.map(tarefa => {
+    const sala = { id: tarefa.classroom_id, name: tarefa.classroom_name }
+    if (!salasMap.has(sala.id)) salasMap.set(sala.id, sala)
+    return {
+      ...tarefa,
+      sala,
+      // O retorno novo utiliza `submission` no singular.
+      submissao: tarefa.submission ?? null
+    }
   })
-  return { salas, atividades, avisos }
+
+  return { salas: [...salasMap.values()].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')), atividades, avisos: [] }
 }

@@ -12,7 +12,7 @@ function destinoPorRole(role) {
     role === 'admin' ||
     role === 'teacher'
   ) {
-    return '/dashboardProfessor.html'
+    return '/professor.html#/professor/dashboard'
   }
 
   return null

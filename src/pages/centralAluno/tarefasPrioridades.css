@@ -1,0 +1,53 @@
+/* Aplicado somente à listagem agrupada de tarefas. Usa os tokens claro/escuro do projeto. */
+.student-task-count { color: var(--color-text-secondary); margin: 0 0 1rem; }
+.student-priority-overview { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .65rem; margin: 1rem 0 1.5rem; }
+.student-priority-counter { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; padding: .85rem; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); min-width: 0; }
+.student-priority-counter > svg { width: 1.05rem; height: 1.05rem; color: var(--priority-tone); }
+.student-priority-counter strong { font-size: 1.2rem; line-height: 1; }
+.student-priority-counter span { width: 100%; color: var(--color-text-secondary); font-size: .75rem; }
+.student-priority--atrasadas { --priority-tone: #ed6666; --priority-wash: rgba(237,102,102,.075); }
+.student-priority--semana { --priority-tone: #d8ac42; --priority-wash: rgba(216,172,66,.08); }
+.student-priority--futuras { --priority-tone: #36ae75; --priority-wash: rgba(54,174,117,.07); }
+.student-priority--semPrazo { --priority-tone: var(--color-text-secondary); --priority-wash: transparent; }
+.student-priority--entregues { --priority-tone: var(--color-text-secondary); --priority-wash: transparent; }
+.student-priority-groups { display: grid; gap: 1.1rem; }
+.student-priority-group { border: 1px solid var(--color-border);  border-radius: 12px; background: var(--color-surface); overflow: hidden; }
+.student-priority-heading { cursor: pointer; display: flex; align-items: center; gap: .9rem; padding: 1rem 1.2rem; background: var(--priority-wash); list-style: none; }
+.student-priority-heading::-webkit-details-marker { display: none; }
+.student-priority-heading:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -3px; }
+.student-priority-heading-icon { display: grid; place-items: center; width: 2.35rem; height: 2.35rem; flex: none; border-radius: 10px; color: var(--priority-tone); border: 1px solid var(--color-border); background: var(--color-surface); }
+.student-priority-heading-icon svg { width: 1.1rem; height: 1.1rem; }
+.student-priority-title { display: grid; gap: .2rem; min-width: 0; flex: 1; }
+.student-priority-title strong { color: var(--color-text); font-size: 1rem; }
+.student-priority-title small { color: var(--color-text-secondary); font-size: .78rem; }
+.student-priority-total { font-weight: 700; color: var(--priority-tone); border-radius: 7px; padding: .22rem .55rem; background: var(--color-surface); }
+.student-priority-chevron { color: var(--color-text-secondary); transition: transform .15s ease; }
+.student-priority-group[open] .student-priority-chevron { transform: rotate(180deg); }
+.student-priority-content { padding: 1rem; border-top: 1px solid var(--color-border); }
+.student-priority-items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.student-task-card.student-priority-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  justify-items: start;
+  row-gap: 1rem;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 1.3rem 1.5rem;
+}
+.student-priority-kind, .student-priority-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; font-size: .77rem; color: var(--color-text-secondary); }
+.student-priority-kind svg, .student-priority-meta svg { width: .95rem; height: .95rem; flex: none; }
+.student-priority-card-title { font-size: 1.02rem; font-weight: 700; color: var(--color-text); overflow-wrap: anywhere; }
+.student-priority-meta { margin: 0; line-height: 1.5; }
+.student-priority-draft { border: 1px solid var(--color-border); padding: .12rem .4rem; border-radius: 6px; color: var(--color-text); }
+.student-priority-link { display: inline-flex; align-items: center; justify-self: end; align-self: center; gap: .5rem; margin-top: .3rem; padding: .15rem 0; color: var(--priority-tone); font-weight: 700; font-size: .85rem; text-align: right; }
+.student-priority-link svg { width: .95rem; height: .95rem; }
+.student-priority-empty { display: flex; align-items: center; gap: .7rem; padding: 1rem; color: var(--color-text-secondary); font-size: .9rem; }
+.student-priority-empty svg { flex: none; width: 1.1rem; height: 1.1rem; color: var(--priority-tone); }
+@media (max-width: 1050px) { .student-priority-overview { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 750px) { .student-priority-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); } .student-priority-items { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .student-priority-overview { grid-template-columns: 1fr 1fr; } .student-priority-heading { padding: .85rem; gap: .55rem; } .student-priority-heading-icon { width: 2rem; height: 2rem; } .student-priority-title strong { font-size: .9rem; } }
+@media (prefers-reduced-motion: reduce) { .student-priority-chevron { transition: none; } }
+
+@media (max-width: 420px) { .student-task-card.student-priority-card { padding: 1.1rem; row-gap: .85rem; } }

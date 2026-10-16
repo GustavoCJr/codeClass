@@ -9,6 +9,9 @@ import SidebarLayout from 'primevue/sidebarlayout'
 import SidebarMain from 'primevue/sidebarmain'
 
 import SidebarAluno from '../../components/sidebarAluno.vue'
+import { useAlunoNavigation } from '../../router/alunoNavigation'
+
+const navegar = useAlunoNavigation()
 
 import {
   buscarDashboardAluno
@@ -213,6 +216,7 @@ onMounted(carregarDashboard)
                 :key="atividade.id"
                 :href="`/atividade.html?id=${encodeURIComponent(atividade.id)}`"
                 class="student-late-item"
+                @click.prevent="navegar(`/atividade.html?id=${encodeURIComponent(atividade.id)}`)"
               >
                 <div class="student-activity-index">
                   !
@@ -275,6 +279,7 @@ onMounted(carregarDashboard)
                   :key="atividade.id"
                   :href="`/atividade.html?id=${encodeURIComponent(atividade.id)}`"
                   class="student-activity-item"
+                  @click.prevent="navegar(`/atividade.html?id=${encodeURIComponent(atividade.id)}`)"
                 >
                   <div class="student-activity-copy">
                     <div class="student-activity-meta">
@@ -351,6 +356,7 @@ onMounted(carregarDashboard)
                   :key="sala.id"
                   :href="`/sala.html?id=${encodeURIComponent(sala.id)}`"
                   class="student-room"
+                  @click.prevent="navegar(`/sala.html?id=${encodeURIComponent(sala.id)}`)"
                 >
                   <span class="student-room-code">
                     {{
@@ -388,7 +394,7 @@ onMounted(carregarDashboard)
             </section>
           </div>
 
-          <a class="student-button student-rooms-link" href="/salas.html">
+          <a class="student-button student-rooms-link" href="/salas.html" @click.prevent="navegar('/salas.html')">
             Ver todas as minhas salas
           </a>
         </template>

@@ -25,6 +25,9 @@ import AddStudentDialog from '../../components/classroom/AddStudentDialog.vue'
 import ClassroomManagement from '../../components/classroom/ClassroomManagement.vue'
 import AssignmentQuickActions from '../../components/assignment/AssignmentQuickActions.vue'
 import StudentQuickActions from '../../components/classroom/StudentQuickActions.vue'
+import ClassroomChat from '../../components/classroom/ClassroomChat.vue'
+import { obterPerfilDaPagina } from '../../config/auth'
+import { Comments } from '@primeicons/vue'
 import { Users, UserPlus, ListCheck, FileEdit, Search, Calendar, Book } from '@primeicons/vue'
 
 import {
@@ -35,6 +38,8 @@ import {
 } from './service'
 
 const aluno = alunoNaPaginaSala()
+const perfilChat = obterPerfilDaPagina()
+const idUsuarioChat = perfilChat?.id || ''
 const dados = ref(null)
 const carregando = ref(true)
 const erro = ref('')
@@ -47,6 +52,7 @@ function obterAbaInicial() {
   if (
     tab === 'geral' ||
     tab === 'atividades' ||
+    tab === 'chat' ||
     (tab === 'alunos' && !aluno)
   ) {
     return tab
@@ -619,6 +625,14 @@ onMounted(carregarSala)
                 {{ dados.membros.students.length }}
               </span>
             </button>
+
+            <button
+              type="button"
+              :class="{ 'classroom-tab--active': abaAtiva === 'chat' }"
+              @click="abaAtiva = 'chat'"
+            >
+              <Comments :size="17" aria-hidden="true" /> Chat
+            </button>
           </nav>
 
           <!-- GERAL -->
@@ -1071,6 +1085,17 @@ onMounted(carregarSala)
                 Adicionar primeiro aluno
               </button>
             </div>
+          </section>
+
+          <!-- CHAT: carregado apenas quando a aba está ativa -->
+          <section v-else-if="abaAtiva === 'chat'" class="classroom-section">
+            <ClassroomChat
+              :key="classroomId"
+              :classroom-id="classroomId"
+              :classroom-name="dados.sala.name"
+              :user-id="idUsuarioChat"
+              :is-moderator="['owner', 'admin'].includes(perfilChat?.role) || (!aluno && dados.sala.teacher_id === idUsuarioChat)"
+            />
           </section>
         </template>
       </main>
