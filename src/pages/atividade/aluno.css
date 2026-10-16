@@ -45,3 +45,122 @@
   .student-assignment-actions > button { width: 100%; }
   .student-code-editor { font-size: 0.8rem; }
 }
+
+/* Ambiente de programação — somente atividade de código do aluno */
+.student-ide { min-width: 0; }
+.student-ide-grid { display:grid; grid-template-columns:minmax(240px, .72fr) minmax(0, 1.7fr); gap:1rem; align-items:stretch; }
+.student-ide-description, .student-ide-workspace, .student-ide-console { min-width:0; border:1px solid var(--color-border); border-radius:12px; background:var(--color-surface); overflow:hidden; }
+.student-ide-description { padding:1.2rem; display:flex; flex-direction:column; gap:.85rem; }
+.student-ide-description h2, .student-ide-console-header h2 { display:flex; align-items:center; gap:.6rem; margin:0; font-size:1rem; }
+.student-ide-description h2 svg, .student-ide-console-header svg, .student-ide-details svg { width:1rem; height:1rem; flex:none; }
+.student-ide-description .student-statement { margin:0; line-height:1.65; overflow-wrap:anywhere; }
+.student-ide-details { margin-top:auto; border-top:1px solid var(--color-border); padding-top:1rem; }
+.student-ide-details h3 { margin:0 0 .75rem; display:flex; align-items:center; gap:.5rem; font-size:.88rem; }
+.student-ide-details p { display:flex; gap:.5rem; align-items:center; font-size:.82rem; color:var(--color-text-secondary); }
+.student-ide-tip { font-size:.81rem; line-height:1.5; color:var(--color-text-secondary); margin:0; }
+.student-ide-toolbar { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.65rem .9rem; background:var(--color-surface-secondary); border-bottom:1px solid var(--color-border); }
+.student-ide-tab, .student-ide-controls { display:flex; gap:.5rem; align-items:center; }
+.student-ide-tab { font-weight:600; font-size:.85rem; white-space:nowrap; }
+.student-ide-tab svg, .student-ide-icon-button svg, .student-ide-buttons svg { width:1rem; height:1rem; flex:none; }
+.student-ide-controls label { color:var(--color-text-secondary); font-size:.8rem; }
+.student-ide-controls select { max-width:155px; min-width:90px; padding:.45rem .5rem; font:inherit; font-size:.83rem; border:1px solid var(--input-border); border-radius:6px; background:var(--input-background); color:var(--color-text); }
+.student-ide-icon-button { display:grid; place-items:center; padding:.45rem; border-radius:6px; color:var(--color-text); background:transparent; border:1px solid var(--color-border); cursor:pointer; }
+.student-ide-workspace .codeclass-monaco-wrapper { min-width:0; }
+.student-ide-caption { font-size:.75rem; line-height:1.5; color:var(--color-text-secondary); padding:.55rem .9rem; margin:0; border-top:1px solid var(--color-border); }
+.student-visually-hidden { position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+.student-ide-actionbar { display:flex; flex-wrap:wrap; gap:.85rem; justify-content:space-between; align-items:center; padding:1rem 0; }
+.student-ide-actionstatus { color:var(--color-text-secondary); font-size:.82rem; }
+.student-ide-unsaved { color:var(--color-text); }
+.student-ide-buttons { display:flex; align-items:center; justify-content:flex-end; gap:.6rem; flex-wrap:wrap; }
+.student-ide-buttons button { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; }
+.student-ide-console-header { padding:1rem 1.2rem; display:flex; justify-content:space-between; align-items:center; gap:.65rem; background:var(--color-surface-secondary); }
+.student-ide-console-header span, .student-ide-testcase-head span { display:inline-flex; gap:.4rem; align-items:center; }
+.student-ide-pass { color:var(--color-success, #189564); }
+.student-ide-fail { color:var(--color-danger); }
+.student-ide-summary { font-size:.84rem; color:var(--color-text-secondary); margin:.85rem 1.2rem; }
+.student-ide-console-tabs { display:flex; flex-wrap:wrap; gap:.25rem; padding:0 1rem; border-bottom:1px solid var(--color-border); }
+.student-ide-console-tabs button { padding:.85rem .8rem; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--color-text-secondary); cursor:pointer; font:inherit; font-size:.82rem; }
+.student-ide-console-tabs button.student-ide-console-tab--active { border-bottom-color:var(--color-primary); color:var(--color-text); font-weight:600; }
+.student-ide-console-body { padding:.85rem 1.2rem; max-height:380px; overflow:auto; }
+.student-ide-testcase { padding:.7rem 0; border-bottom:1px solid var(--color-border); }
+.student-ide-testcase:last-child { border-bottom:0; }
+.student-ide-testcase-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; font-size:.86rem; font-weight:600; }
+.student-ide-testcase small { color:var(--color-text-secondary); }
+.student-ide-output { margin-bottom:1rem; }
+.student-ide-output pre { padding:.9rem; max-width:100%; max-height:240px; overflow:auto; border-radius:6px; background:var(--color-surface-secondary); color:var(--color-text); font-family:var(--font-mono); white-space:pre-wrap; overflow-wrap:anywhere; }
+.student-ide-empty { padding:1.2rem; color:var(--color-text-secondary); }
+.student-ide--focus .student-ide-grid { grid-template-columns:minmax(0,1fr); }
+.student-ide--focus .student-ide-description { display:none; }
+.student-ide--focus .codeclass-monaco-host { height:min(72vh,780px); }
+.student-ide :is(button, select):focus-visible { outline:2px solid var(--color-primary); outline-offset:2px; }
+@media (max-width:900px) { .student-ide-grid { grid-template-columns:1fr; } }
+@media (max-width:650px) { .student-ide-toolbar { flex-wrap:wrap; } .student-ide-buttons { width:100%; } .student-ide-buttons button { flex:1 1 100%; } }
+
+/* Redesign do workspace de código. Escopo limitado à atividade de código. */
+.student-code-hero { margin: 1.15rem 0 1.4rem; padding: 1.45rem 1.6rem; border: 1px solid var(--color-border); border-radius: 16px; background: var(--color-surface); }
+.student-code-hero-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.7rem; margin-bottom:1rem; }
+.student-code-hero-type { display:inline-flex; align-items:center; gap:.55rem; font-size:.7rem; font-weight:750; letter-spacing:.085em; color:var(--color-primary); }
+.student-code-hero-type svg { width:1rem; height:1rem; }
+.student-code-status { display:inline-flex; align-items:center; gap:.55rem; border-radius:999px; padding:.45rem .75rem; font-size:.72rem; font-weight:700; background:var(--color-surface-secondary); border:1px solid var(--color-border); color:var(--color-text); }
+.student-code-status-dot { width:.45rem; height:.45rem; flex:none; border-radius:50%; background:currentColor; }
+.student-code-status--pending { color:#c89424; background:rgba(211,166,38,.09); border-color:rgba(211,166,38,.28); }
+.student-code-status--draft { color:#539be7; background:rgba(83,155,231,.09); border-color:rgba(83,155,231,.28); }
+.student-code-status--closed { color:var(--color-danger); background:var(--color-danger-soft); border-color:var(--color-danger-border); }
+.student-code-status--submitted { color:var(--color-success, #218c62); background:rgba(39,161,112,.09); border-color:rgba(39,161,112,.28); }
+.student-code-hero-main { display:flex; align-items:end; justify-content:space-between; flex-wrap:wrap; gap:1.3rem; }
+.student-code-hero h1 { margin:0 0 .45rem; font-size:clamp(1.55rem,2.7vw,2.35rem); line-height:1.15; overflow-wrap:anywhere; }
+.student-code-hero-subtitle { color:var(--color-text-secondary); margin:0; line-height:1.55; font-size:.87rem; max-width:58ch; }
+.student-code-hero-facts { display:flex; flex-wrap:wrap; gap:.7rem; }
+.student-code-hero-facts > span { display:flex; align-items:center; gap:.6rem; padding:.7rem .8rem; border-radius:9px; background:var(--color-surface-secondary); border:1px solid var(--color-border); }
+.student-code-hero-facts svg { width:1rem; height:1rem; color:var(--color-primary); }
+.student-code-hero-facts small { display:block; font-size:.64rem; color:var(--color-text-secondary); margin-bottom:.12rem; }
+.student-code-hero-facts strong { font-size:.75rem; font-weight:650; }
+.student-ide { display:block; }
+.student-ide-grid { grid-template-columns:minmax(240px,.67fr) minmax(0,1.75fr); gap:1.1rem; }
+.student-ide-description,.student-ide-workspace,.student-ide-console { border-radius:14px; }
+.student-ide-description { gap:0; padding:0; }
+.student-ide-context-header { display:flex; align-items:center; gap:.7rem; padding:1.2rem 1.2rem .85rem; }
+.student-ide-context-header > svg { width:1.15rem; height:1.15rem; color:var(--color-primary); }
+.student-ide-context-header span,.student-ide-console-heading span:not(.student-ide-console-symbol) { display:block; font-size:.6rem; letter-spacing:.12em; font-weight:750; color:var(--color-text-secondary); margin-bottom:.15rem; }
+.student-ide-context-header h2 { font-size:1.03rem; }
+.student-ide-statement-box { margin:0 1.2rem 1.25rem; padding:1rem; border-radius:10px; background:var(--color-surface-secondary); min-height:7rem; }
+.student-ide-statement-box p { line-height:1.7; font-size:.87rem; }
+.student-ide-no-statement { display:flex; flex-direction:column; align-items:flex-start; gap:.5rem; color:var(--color-text-secondary); }
+.student-ide-no-statement svg { width:1.1rem; height:1.1rem; opacity:.8; }
+.student-ide-no-statement strong { color:var(--color-text); font-size:.83rem; }
+.student-ide-no-statement p { font-size:.78rem; margin:0; }
+.student-ide-context-section { padding:1.15rem 1.2rem; border-top:1px solid var(--color-border); }
+.student-ide-context-section h3,.student-ide-help h3 { display:flex; gap:.55rem; align-items:center; margin:0 0 .85rem; font-size:.85rem; }
+.student-ide-context-section h3 svg,.student-ide-help h3 svg { width:1rem; height:1rem; color:var(--color-primary); }
+.student-ide-limits { display:grid; gap:.55rem; }
+.student-ide-limits > div { display:flex; gap:.55rem; align-items:center; padding:.6rem .7rem; background:var(--color-surface-secondary); border-radius:8px; }
+.student-ide-limits svg { width:.95rem; height:.95rem; flex:none; color:var(--color-text-secondary); }
+.student-ide-limits span { color:var(--color-text-secondary); font-size:.74rem; flex:1; }
+.student-ide-limits strong { font-size:.77rem; white-space:nowrap; }
+.student-ide-help { margin-top:auto; padding:1.1rem 1.2rem; border-top:1px solid var(--color-border); }
+.student-ide-help p { color:var(--color-text-secondary); font-size:.78rem; line-height:1.6; margin:0; }
+.student-ide-toolbar { padding:.8rem 1rem; }
+.student-ide-tab > span { display:flex; flex-direction:column; gap:.1rem; }
+.student-ide-tab strong { font-size:.87rem; }
+.student-ide-tab small { font-size:.67rem; color:var(--color-text-secondary); font-weight:400; }
+.student-ide-toolbar .student-ide-controls { gap:.55rem; }
+.student-ide-caption { display:flex; gap:.55rem; align-items:flex-start; padding:.85rem 1rem; }
+.student-ide-caption svg { width:.95rem; height:.95rem; flex:none; color:var(--color-text-secondary); }
+.student-ide-actionbar { margin:1rem 0; border:1px solid var(--color-border); border-radius:12px; padding:.85rem 1rem; background:var(--color-surface); }
+.student-ide-actionstatus .student-ide-ready,.student-ide-actionstatus .student-ide-unsaved { display:flex; align-items:center; gap:.7rem; }
+.student-ide-actionstatus svg { width:1.15rem; height:1.15rem; color:var(--color-success,#218c62); flex:none; }
+.student-ide-actionstatus strong { display:block; font-size:.82rem; color:var(--color-text); }
+.student-ide-actionstatus small { display:block; margin-top:.14rem; font-size:.7rem; color:var(--color-text-secondary); }
+.student-ide-status-dot { width:.58rem; height:.58rem; border-radius:50%; flex:none; background:#d1a035; }
+.student-ide-buttons button { border-radius:9px; }
+.student-ide-console-heading { display:flex; gap:.8rem; align-items:center; }
+.student-ide-console-symbol { display:grid!important; place-items:center; width:2.25rem; height:2.25rem; border-radius:9px; background:var(--color-surface); border:1px solid var(--color-border); }
+.student-ide-console-heading h2 { margin:0; font-size:.9rem; }
+.student-ide-console-header { padding:.9rem 1.15rem; }
+.student-ide-empty { display:flex; align-items:center; justify-content:center; gap:1.1rem; min-height:130px; padding:1.4rem; }
+.student-ide-empty-symbol { display:grid; place-items:center; width:3rem; height:3rem; flex:none; border-radius:12px; background:var(--color-surface-secondary); color:var(--color-primary); }
+.student-ide-empty-symbol svg { width:1.25rem; height:1.25rem; }
+.student-ide-empty strong { color:var(--color-text); font-size:.9rem; }
+.student-ide-empty p { max-width:40ch; margin:.4rem 0 0; font-size:.8rem; line-height:1.55; }
+@media(max-width:900px) { .student-ide-grid { grid-template-columns:1fr; } .student-ide-statement-box { min-height:0; } }
+@media(max-width:650px) { .student-code-hero { padding:1.1rem; } .student-code-hero-facts { width:100%; } .student-code-hero-facts > span { flex:1 1 140px; } .student-ide-empty { justify-content:flex-start; } .student-ide-actionbar { padding:.85rem; } }
