@@ -162,6 +162,7 @@ function continuarNovaTarefa(dadosIniciais) {
             </article>
           </section>
 
+          <div class="dashboard-priority-grid">
           <section class="dashboard-focus">
             <div class="dashboard-focus-heading">
               <span>// SEU FOCO AGORA</span>
@@ -194,12 +195,32 @@ function continuarNovaTarefa(dadosIniciais) {
                 class="dashboard-focus-action"
                 :href="dados.focoPrincipal.href"
               >
-                Corrigir agora
+                {{ dados.focoPrincipal.tipo === 'correcao' ? 'Corrigir agora' : 'Ver atividades' }}
 
                 <span aria-hidden="true">→</span>
               </a>
             </div>
           </section>
+
+            <aside class="dashboard-shortcuts" aria-label="Ações rápidas">
+              <h2>Ações rápidas</h2>
+              <button type="button" class="dashboard-shortcut" @click="abrirNovaTarefa">
+                <span class="dashboard-shortcut-icon" aria-hidden="true">+</span>
+                <span class="dashboard-shortcut-copy"><strong>Criar atividade</strong><small>Monte uma atividade para suas turmas.</small></span>
+                <span class="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+              </button>
+              <a class="dashboard-shortcut" :href="dados.links.todasSalas">
+                <span class="dashboard-shortcut-icon" aria-hidden="true">⌂</span>
+                <span class="dashboard-shortcut-copy"><strong>Ver todas as salas</strong><small>Acesse suas turmas.</small></span>
+                <span class="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="dashboard-shortcut" :href="dados.links.todasTarefas">
+                <span class="dashboard-shortcut-icon" aria-hidden="true">≡</span>
+                <span class="dashboard-shortcut-copy"><strong>Ver atividades</strong><small>Gerencie atividades e prazos.</small></span>
+                <span class="dashboard-shortcut-arrow" aria-hidden="true">→</span>
+              </a>
+            </aside>
+          </div>
 
           <section class="dashboard-section salas-section">
             <div class="section-heading">
@@ -257,7 +278,7 @@ function continuarNovaTarefa(dadosIniciais) {
 
                 <a
                   class="section-link"
-                  :href="'/correcoes.html'"
+                  :href="'/professor.html#/professor/correcoes'"
                 >
                   Ver todas
 

@@ -6,17 +6,17 @@
 .cc-sidebar {
   min-height: 100vh;
 
-  background: var(--sidebar-background);
-  border-right: 1px solid var(--sidebar-border);
+  background: var(--cc-sidebar-brand-bg);
+  border-right: 1px solid var(--cc-sidebar-brand-border);
 
-  color: var(--color-text);
+  color: var(--cc-sidebar-brand-text);
 }
 
 .cc-sidebar-aside {
   width: 100%;
   height: 100vh;
 
-  background: var(--sidebar-background);
+  background: var(--cc-sidebar-brand-bg);
 }
 
 .cc-sidebar-panel {
@@ -25,7 +25,7 @@
   width: 100%;
   height: 100%;
 
-  background: var(--sidebar-background);
+  background: var(--cc-sidebar-brand-bg);
 }
 
 /* ==================================================
@@ -68,7 +68,7 @@
   min-height: 73px;
   padding: 16px !important;
 
-  border-bottom: 1px solid var(--sidebar-border);
+  border-bottom: 1px solid var(--cc-sidebar-brand-border);
   gap: 0 !important;
 }
 
@@ -116,7 +116,7 @@
 }
 
 .cc-sidebar-brand-text strong {
-  color: var(--color-text);
+  color: var(--cc-sidebar-brand-text);
 
   font-size: 16px;
   font-weight: 700;
@@ -148,7 +148,7 @@
   margin-bottom: 8px;
   padding: 0 10px;
 
-  color: var(--sidebar-text-muted);
+  color: var(--cc-sidebar-brand-muted);
 
   font-size: 11px;
   font-weight: 700;
@@ -182,7 +182,7 @@
   border-radius: 9px;
 
   background: transparent;
-  color: var(--sidebar-text);
+  color: var(--cc-sidebar-brand-text);
 
   font: inherit;
   font-size: 14px;
@@ -199,8 +199,8 @@
 }
 
 .cc-sidebar .cc-sidebar-button:hover {
-  background: var(--sidebar-item-hover);
-  color: var(--color-text);
+  background: var(--cc-sidebar-brand-hover);
+  color: var(--cc-sidebar-brand-text);
 }
 
 .cc-sidebar .cc-sidebar-button:active {
@@ -208,26 +208,26 @@
 }
 
 .cc-sidebar .cc-sidebar-button.cc-sidebar-button-active {
-  background: var(--sidebar-item-active);
-  color: var(--sidebar-item-active-text);
+  background: var(--cc-sidebar-brand-active);
+  color: var(--cc-sidebar-brand-text);
 
   font-weight: 600;
 }
 
 .cc-sidebar .cc-sidebar-button.cc-sidebar-button-active:hover {
-  background: var(--sidebar-item-active);
-  color: var(--sidebar-item-active-text);
+  background: var(--cc-sidebar-brand-active);
+  color: var(--cc-sidebar-brand-text);
 }
 
 .cc-sidebar .cc-sidebar-button-disabled {
-  opacity: 0.62;
+  opacity: 1;
 
   cursor: default;
 }
 
 .cc-sidebar .cc-sidebar-button-disabled:hover {
   background: transparent;
-  color: var(--sidebar-text);
+  color: var(--cc-sidebar-brand-text);
 }
 
 
@@ -280,8 +280,8 @@
 
 .cc-sidebar-footer {
   padding: 12px;
-  border-top: 1px solid var(--sidebar-border);
-  background: var(--sidebar-footer-background);
+  border-top: 1px solid var(--cc-sidebar-brand-border);
+  background: var(--cc-sidebar-brand-bg);
 }
 
 .cc-sidebar-footer-actions {
@@ -305,7 +305,7 @@
   border-radius: 9px;
 
   background: transparent;
-  color: var(--sidebar-text);
+  color: var(--cc-sidebar-brand-text);
 
   font: inherit;
   font-size: 13px;
@@ -319,8 +319,8 @@
 }
 
 .cc-sidebar-footer-button:hover {
-  background: var(--sidebar-item-hover);
-  color: var(--color-text);
+  background: var(--cc-sidebar-brand-hover);
+  color: var(--cc-sidebar-brand-text);
 }
 
 .cc-sidebar-footer-button:active {
@@ -334,11 +334,11 @@
 
 .cc-sidebar-collapse-button {
   margin-bottom: 6px;
-  color: var(--sidebar-text-muted);
+  color: var(--cc-sidebar-brand-muted);
 }
 
 .cc-sidebar-collapse-button:hover {
-  color: var(--color-text);
+  color: var(--cc-sidebar-brand-text);
 }
 
 .cc-sidebar-collapse-button .cc-sidebar-icon {
@@ -371,7 +371,7 @@
 
 .cc-sidebar-content::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: var(--color-border-strong);
+  background: var(--cc-sidebar-brand-scrollbar);
 }
 
 
@@ -496,3 +496,75 @@
     padding-inline: 0;
   }
 }
+
+/* CODECLASS SIDEBAR: CONTRASTE FINAL */
+/* Cores declaradas exclusivamente em src/styles/variables.css. */
+.cc-sidebar,
+.cc-sidebar > .p-sidebar-aside.cc-sidebar-aside,
+.cc-sidebar .cc-sidebar-panel.cc-sidebar-panel,
+.cc-sidebar .cc-sidebar-header.cc-sidebar-header,
+.cc-sidebar .cc-sidebar-content.cc-sidebar-content,
+.cc-sidebar .cc-sidebar-footer.cc-sidebar-footer {
+  background: var(--cc-sidebar-brand-bg);
+  color: var(--cc-sidebar-brand-text);
+}
+
+.cc-sidebar .cc-sidebar-brand-text strong,
+.cc-sidebar .cc-sidebar-button,
+.cc-sidebar .cc-sidebar-button .cc-sidebar-text,
+.cc-sidebar .cc-sidebar-footer-button,
+.cc-sidebar .cc-sidebar-footer-button .cc-sidebar-text,
+.cc-sidebar .cc-sidebar-group-label {
+  color: var(--cc-sidebar-brand-text);
+}
+
+.cc-sidebar .cc-sidebar-brand-text strong span {
+  color: var(--cc-sidebar-brand-accent);
+}
+
+.cc-sidebar .cc-sidebar-button:hover,
+.cc-sidebar .cc-sidebar-footer-button:hover,
+.cc-sidebar .cc-sidebar-footer-button:focus-visible {
+  background: var(--cc-sidebar-brand-hover);
+  color: var(--cc-sidebar-brand-text);
+}
+
+.cc-sidebar .cc-sidebar-button.cc-sidebar-button-active,
+.cc-sidebar .cc-sidebar-button.cc-sidebar-button-active:hover,
+.cc-sidebar .cc-sidebar-button.cc-sidebar-button-active:focus-visible {
+  background: var(--cc-sidebar-brand-active);
+  color: var(--cc-sidebar-brand-text);
+  border-left: 0;
+  box-shadow: none;
+}
+
+.cc-sidebar .cc-sidebar-button.cc-sidebar-button-active .cc-sidebar-menu-icon {
+  color: var(--cc-sidebar-brand-accent);
+}
+
+.cc-sidebar .cc-sidebar-footer-button:not(:hover):not(:focus-visible) {
+  background: transparent;
+  color: var(--cc-sidebar-brand-text);
+}
+
+.cc-sidebar .cc-sidebar-button-disabled:hover {
+  background: transparent;
+}
+/* CODECLASS SIDEBAR: CONTRASTE FINAL FIM */
+
+/* CODECLASS LOGO CIRCULAR: INICIO */
+/* A cor vem do variables.css. O mesmo icone e usado nos estados aberto e recolhido. */
+.cc-sidebar .cc-sidebar-logo {
+  background: var(--cc-sidebar-logo-circle-bg);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.cc-sidebar .cc-sidebar-logo img {
+  width: 36px;
+  height: 36px;
+  max-width: none;
+  flex: 0 0 36px;
+  object-fit: contain;
+}
+/* CODECLASS LOGO CIRCULAR: FIM */

@@ -3,6 +3,32 @@
    ================================================== */
 
 :root {
+  /* Identidade da sidebar do professor: preto fixo nos dois temas. */
+  --cc-sidebar-brand-bg: #080808;
+  --cc-sidebar-brand-border: #303532;
+  --cc-sidebar-brand-text: var(--cc-white);
+  --cc-sidebar-brand-muted: var(--cc-white);
+  --cc-sidebar-brand-accent: var(--cc-green-500);
+  --cc-sidebar-brand-hover: #19271e;
+  --cc-sidebar-brand-active: #173b2a;
+  --cc-sidebar-brand-scrollbar: #526058;
+  --cc-sidebar-logo-circle-bg: var(--cc-white);
+
+  /* Grafite neutro e bem escuro, inspirado na referencia enviada (Discord).
+     Uso exclusivo do portal do professor; sem subtom esverdeado. */
+  --cc-professor-graphite-background: #1a1a1e;
+  --cc-professor-graphite-surface: #242429;
+  --cc-professor-graphite-surface-secondary: #2b2b31;
+  --cc-professor-graphite-surface-hover: #303037;
+  --cc-professor-graphite-surface-active: #393940;
+  --cc-professor-graphite-border: #35353c;
+  --cc-professor-graphite-border-strong: #484850;
+  --cc-professor-graphite-text: #f2f3f5;
+  --cc-professor-graphite-text-secondary: #c7c8ce;
+  --cc-professor-graphite-text-muted: #999ba5;
+  --cc-professor-graphite-text-disabled: #71727b;
+  --cc-professor-graphite-highlight-border: #303036;
+
   --cc-green-50: #e5f8ee;
   --cc-green-100: #c7f2da;
   --cc-green-200: #8ee5b7;
@@ -127,4 +153,28 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 14px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.45);
+}
+
+/* O grafite aplica-se apenas ao portal docente no tema escuro.
+   A sidebar usa --cc-sidebar-brand-bg (#080808), fixo nos dois temas;
+   o tema claro e a SPA do aluno permanecem inalterados. */
+[data-theme="dark"] .dashboard-layout {
+  --color-background: var(--cc-professor-graphite-background);
+  --color-surface: var(--cc-professor-graphite-surface);
+  --color-surface-secondary: var(--cc-professor-graphite-surface-secondary);
+  --color-surface-hover: var(--cc-professor-graphite-surface-hover);
+  --color-surface-active: var(--cc-professor-graphite-surface-active);
+  --color-border: var(--cc-professor-graphite-border);
+  --color-border-strong: var(--cc-professor-graphite-border-strong);
+  --color-text: var(--cc-professor-graphite-text);
+  --color-text-secondary: var(--cc-professor-graphite-text-secondary);
+  --color-text-muted: var(--cc-professor-graphite-text-muted);
+  --color-text-disabled: var(--cc-professor-graphite-text-disabled);
+
+  /* O painel "Seu foco agora" permanece preto, nao verde-escuro. */
+  --color-highlight-surface: var(--cc-sidebar-brand-bg);
+  --color-highlight-border: var(--cc-professor-graphite-highlight-border);
+  --color-highlight-text: var(--cc-professor-graphite-text);
+  --color-highlight-text-secondary: var(--cc-professor-graphite-text-secondary);
+  --color-highlight-text-muted: var(--cc-professor-graphite-text-muted);
 }

@@ -1,5 +1,5 @@
 <script setup>
-// v3: Salas abre /salas.html; /sala.html apenas mantém o item ativo
+// Navegação docente: links legados são resolvidos para a SPA quando possível.
 import { computed, inject, ref } from 'vue'
 import { routerKey, routeLocationKey } from 'vue-router'
 import { converterLinkProfessor } from '../router/professorNavigation'
@@ -48,7 +48,7 @@ import './sidebarProfessor.css'
 
 const router = inject(routerKey, null)
 const route = inject(routeLocationKey, null)
-const spaAtiva = computed(() => route?.path?.startsWith('/professor/') ?? false)
+const spaAtiva = computed(() => Boolean(router) && (route?.path?.startsWith('/professor/') || window.location.pathname.endsWith('/professor.html')))
 const sidebarAberta = ref(true)
 
 
@@ -126,9 +126,17 @@ function navegar(item) {
     return
   }
 
-  const destino = spaAtiva.value && converterLinkProfessor(item.url)
-  if (destino) { router.push(destino); return }
-  window.location.href = item.url
+  const destino = converterLinkProfessor(item.url)
+  if (destino) {
+    if (spaAtiva.value && router) {
+      router.push(destino)
+      return
+    }
+    // Mesmo partindo de uma página HTML legada, abre a SPA docente.
+    window.location.assign(`/professor.html#${destino}`)
+    return
+  }
+  window.location.assign(item.url)
 }
 
 /* ==================================================

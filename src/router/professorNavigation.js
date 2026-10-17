@@ -20,8 +20,15 @@ export function converterLinkProfessor(href) {
 export function useProfessorNavigation() {
   const router = inject(routerKey, null)
   return (href) => {
-    const path = router && converterLinkProfessor(href)
-    if (path) return router.push(path)
+    const path = converterLinkProfessor(href)
+    if (path) {
+      // Na SPA, troca somente a rota; na página legada, entra na SPA correta.
+      if (router && window.location.pathname.endsWith('/professor.html')) {
+        return router.push(path)
+      }
+      window.location.assign(`/professor.html#${path}`)
+      return
+    }
     window.location.assign(href)
   }
 }

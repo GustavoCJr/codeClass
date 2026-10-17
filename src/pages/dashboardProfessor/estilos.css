@@ -1052,3 +1052,76 @@
 
 /* Dashboard enxuto: painel único de correções */
 .dashboard-work-grid { grid-template-columns: minmax(0, 1fr); }
+
+
+/* ===========================================================
+   Dashboard compacta — inspirada na previa aprovada
+   Somente superfícies sólidas: SEM gradientes; tokens do tema.
+   =========================================================== */
+.dashboard-content { max-width: 1440px; padding: 27px 30px 42px; background: var(--color-background); }
+.dashboard-content .dashboard-hero { align-items: center; gap: 20px; margin-bottom: 23px; }
+.dashboard-content .dashboard-eyebrow { margin-bottom: 10px; }
+.dashboard-content .dashboard-eyebrow::before { width: 16px; }
+.dashboard-content .dashboard-hero h1 { max-width: 800px; font-size: clamp(28px, 3vw, 42px); line-height: 1.09; }
+.dashboard-content .dashboard-hero h1 span { color: var(--color-primary); }
+.dashboard-content .dashboard-hero-copy > p:last-child { margin-top: 9px; font-size: 14px; line-height: 1.48; }
+.dashboard-content .dashboard-hero-actions { gap: 8px; }
+.dashboard-content .dashboard-action { min-height: 40px; border-radius: 7px; }
+.dashboard-content .dashboard-notification-button { width: 40px; height: 40px; }
+
+/* A faixa compartilha um contorno e duas métricas reais. */
+.dashboard-content .dashboard-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: 17px; overflow: hidden; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 9px; box-shadow: none; }
+.dashboard-content .dashboard-metric { position: relative; min-height: 91px; padding: 20px 25px 20px 79px; border-right: 1px solid var(--color-border); background: transparent; }
+.dashboard-content .dashboard-metric:last-child { border-right: 0; }
+.dashboard-content .dashboard-metric::before { content: '▣'; position: absolute; left: 24px; top: 50%; display: grid; place-items: center; width: 40px; height: 40px; transform: translateY(-50%); border-radius: 9px; background: var(--color-primary-soft); color: var(--color-primary); font: 24px/1 var(--font-mono); }
+.dashboard-content .dashboard-metric--attention::before { content: '✓'; background: var(--color-surface-secondary); color: var(--color-text-secondary); font-size: 23px; }
+.dashboard-content .dashboard-metric strong { margin-bottom: 3px; font-size: 30px; font-family: inherit; font-weight: 750; }
+.dashboard-content .dashboard-metric span { font-size: 10px; color: var(--color-text-secondary); }
+.dashboard-content .dashboard-metric--attention strong { color: var(--color-text); }
+
+/* Destaque mais contido, acompanhado de ações rápidas. */
+.dashboard-priority-grid { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(270px,.85fr); gap: 14px; align-items: stretch; margin-bottom: 20px; }
+.dashboard-content .dashboard-focus { display: flex; flex-direction: column; min-height: 220px; padding: 23px 25px; margin: 0; border-radius: 9px; background: var(--color-highlight-surface); }
+.dashboard-content .dashboard-focus::before { display: none; }
+.dashboard-content .dashboard-focus::after { display: none; }
+.dashboard-content .dashboard-focus-heading { margin-bottom: 18px; }
+.dashboard-content .dashboard-focus-body { flex: 1; align-items: flex-start; flex-direction: column; justify-content: space-between; gap: 15px; }
+.dashboard-content .dashboard-focus h2 { font-size: clamp(21px,2.15vw,29px); }
+.dashboard-content .dashboard-focus-count { margin-bottom: 5px; font-size: 12px; }
+.dashboard-content .dashboard-focus-copy > p:last-child { margin-top: 7px; font-size: 12px; }
+.dashboard-content .dashboard-focus-action { min-height: 38px; padding: 0 15px; border-radius: 6px; }
+.dashboard-shortcuts { display: flex; flex-direction: column; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 9px; padding: 15px 18px 9px; min-width: 0; }
+.dashboard-shortcuts h2 { margin: 0 0 8px; color: var(--color-text); font-size: 16px; line-height: 1.4; }
+.dashboard-shortcut { display: flex; align-items: center; min-width: 0; width: 100%; gap: 12px; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--color-border); background: transparent; text-align: left; color: var(--color-text); text-decoration: none; cursor: pointer; font: inherit; }
+.dashboard-shortcut:last-child { border-bottom: 0; }
+.dashboard-shortcut:hover { background: var(--color-surface-hover); color: var(--color-text); }
+.dashboard-shortcut:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+.dashboard-shortcut-icon { display: inline-grid; flex: 0 0 34px; width: 34px; height: 34px; place-items: center; color: var(--color-primary); background: var(--color-primary-soft); border-radius: 7px; font-size: 21px; font-weight: 500; }
+.dashboard-shortcut-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
+.dashboard-shortcut-copy strong { font-size: 12px; font-weight: 700; }
+.dashboard-shortcut-copy small { font-size: 11px; color: var(--color-text-secondary); line-height: 1.3; }
+.dashboard-shortcut-arrow { color: var(--color-text-muted); font-size: 18px; }
+
+/* Seções e linhas densas, alinhadas à linguagem da landing. */
+.dashboard-content .salas-section { margin-bottom: 20px; }
+.dashboard-content .section-heading { padding-bottom: 9px; margin-bottom: 10px; }
+.dashboard-content .section-heading h2 { font-size: 18px; }
+.dashboard-content .section-link { color: var(--color-primary); }
+.dashboard-content .salas-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.dashboard-content .salas-grid .classroom-card { min-height: 105px; padding: 13px 16px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); box-shadow: none; }
+.dashboard-content .salas-grid .classroom-card:hover { border-color: var(--color-primary-border-medium); background: var(--color-surface-hover); transform: none; }
+.dashboard-content .salas-grid .classroom-card-topline { margin-bottom: 9px; }
+.dashboard-content .salas-grid .classroom-card-title { font-size: 14px; }
+.dashboard-content .salas-grid .classroom-card-description { font-size: 12px; }
+.dashboard-content .dashboard-work-grid { display: grid; grid-template-columns: minmax(0,1fr); margin-bottom: 18px; gap: 0; }
+.dashboard-content .dashboard-panel { border-radius: 9px; }
+.dashboard-content .dashboard-panel .section-heading { margin: 0; padding: 14px 17px; }
+.dashboard-content .correction-item { min-height: 62px; padding: 11px 16px; gap: 10px; }
+.dashboard-content .correction-count { min-width: 56px; }
+.dashboard-content .correction-count strong { font-size: 18px; }
+.dashboard-content .dashboard-panel-empty { padding: 18px; }
+
+@media (max-width: 1040px) { .dashboard-content { padding: 24px 23px 40px; } .dashboard-priority-grid { grid-template-columns: minmax(0,1fr); } .dashboard-shortcuts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; } .dashboard-shortcuts h2 { grid-column: 1/-1; } .dashboard-shortcut { border: 0; } }
+@media (max-width: 720px) { .dashboard-content { padding: 17px 15px 32px; } .dashboard-content .dashboard-hero { align-items: flex-start; gap: 14px; } .dashboard-content .dashboard-hero h1 { font-size: 30px; } .dashboard-content .dashboard-hero-actions { width: 100%; } .dashboard-content .dashboard-metric { min-height: 82px; padding: 16px 12px 16px 50px; } .dashboard-content .dashboard-metric::before { left: 10px; width: 30px; height: 30px; font-size: 17px; } .dashboard-content .dashboard-metric strong { font-size: 25px; } .dashboard-content .dashboard-metric span { font-size: 9px; } .dashboard-content .dashboard-focus { min-height: unset; padding: 19px; } .dashboard-shortcuts { display: flex; } .dashboard-shortcut { border-bottom: 1px solid var(--color-border); } .dashboard-content .salas-grid { grid-template-columns: 1fr; } }
+@media (max-width: 390px) { .dashboard-content .dashboard-metric { padding-left: 12px; } .dashboard-content .dashboard-metric::before { display: none; } }
+@media (prefers-reduced-motion: reduce) { .dashboard-content .dashboard-action, .dashboard-content .dashboard-focus-action, .dashboard-content .correction-arrow { transition: none; } }

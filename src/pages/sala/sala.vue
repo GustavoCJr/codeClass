@@ -26,8 +26,9 @@ import ClassroomManagement from '../../components/classroom/ClassroomManagement.
 import AssignmentQuickActions from '../../components/assignment/AssignmentQuickActions.vue'
 import StudentQuickActions from '../../components/classroom/StudentQuickActions.vue'
 import ClassroomChat from '../../components/classroom/ClassroomChat.vue'
+import ClassroomMaterials from '../../components/classroom/ClassroomMaterials.vue'
 import { obterPerfilDaPagina } from '../../config/auth'
-import { Comments } from '@primeicons/vue'
+import { Comments, Folder } from '@primeicons/vue'
 import { Users, UserPlus, ListCheck, FileEdit, Search, Calendar, Book } from '@primeicons/vue'
 
 import {
@@ -41,6 +42,10 @@ const aluno = alunoNaPaginaSala()
 const perfilChat = obterPerfilDaPagina()
 const idUsuarioChat = perfilChat?.id || ''
 const dados = ref(null)
+const podeGerenciarMateriais = computed(() =>
+  perfilChat?.role === 'owner' ||
+  (perfilChat?.role === 'teacher' && dados.value?.sala?.teacher_id === idUsuarioChat)
+)
 const carregando = ref(true)
 const erro = ref('')
 
@@ -53,6 +58,7 @@ function obterAbaInicial() {
     tab === 'geral' ||
     tab === 'atividades' ||
     tab === 'chat' ||
+    tab === 'materiais' ||
     (tab === 'alunos' && !aluno)
   ) {
     return tab
@@ -628,6 +634,14 @@ onMounted(carregarSala)
 
             <button
               type="button"
+              :class="{ 'classroom-tab--active': abaAtiva === 'materiais' }"
+              @click="abaAtiva = 'materiais'"
+            >
+              <Folder :size="17" aria-hidden="true" /> Materiais
+            </button>
+
+            <button
+              type="button"
               :class="{ 'classroom-tab--active': abaAtiva === 'chat' }"
               @click="abaAtiva = 'chat'"
             >
@@ -1085,6 +1099,15 @@ onMounted(carregarSala)
                 Adicionar primeiro aluno
               </button>
             </div>
+          </section>
+
+          <!-- MATERIAIS: busca somente ao abrir a aba -->
+          <section v-else-if="abaAtiva === 'materiais'" class="classroom-section">
+            <ClassroomMaterials
+              :key="classroomId"
+              :classroom-id="classroomId"
+              :can-manage="podeGerenciarMateriais"
+            />
           </section>
 
           <!-- CHAT: carregado apenas quando a aba está ativa -->

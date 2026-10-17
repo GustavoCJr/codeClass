@@ -33,7 +33,7 @@ export async function buscarDashboardProfessor() {
       codigo: `SALA ${String(index + 1).padStart(2, '0')}`,
       nome: sala.name,
       descricao: sala.description || 'Sem descrição',
-      href: `/sala.html?id=${encodeURIComponent(sala.id)}`
+      href: `/professor.html#/professor/sala?id=${encodeURIComponent(sala.id)}`
     }))
 
   const grupos = new Map()
@@ -46,7 +46,7 @@ export async function buscarDashboardProfessor() {
         atividade: atividade.title || 'Atividade',
         sala: nomesSalas.get(atividade.classroom_id) || 'Sala',
         quantidade: 0,
-        href: '/correcoes.html'
+        href: '/professor.html#/professor/correcoes'
       })
     }
     grupos.get(atividade.id).quantidade += 1
@@ -61,7 +61,7 @@ export async function buscarDashboardProfessor() {
         sala: prioridade.sala,
         quantidade: prioridade.quantidade,
         descricao: 'atividade com maior fila de correção',
-        href: '/correcoes.html'
+        href: '/professor.html#/professor/correcoes'
       }
     : {
         tipo: 'sem-correcao',
@@ -69,7 +69,7 @@ export async function buscarDashboardProfessor() {
         sala: correcoesDisponiveis ? 'Tudo em dia' : 'Tente novamente mais tarde',
         quantidade: 0,
         descricao: correcoesDisponiveis ? 'não há entregas aguardando avaliação' : 'não foi possível consultar as entregas',
-        href: '/tarefas.html'
+        href: '/professor.html#/professor/tarefas'
       }
 
   return {
@@ -89,9 +89,9 @@ export async function buscarDashboardProfessor() {
     salasRecentes,
     correcoesPendentes,
     links: {
-      todasSalas: '/salas.html',
-      todasTarefas: '/tarefas.html',
-      criarTarefa: '/criarTarefa.html'
+      todasSalas: '/professor.html#/professor/salas',
+      todasTarefas: '/professor.html#/professor/tarefas',
+      criarTarefa: '/professor.html#/professor/criar-tarefa'
     }
   }
 }
